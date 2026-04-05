@@ -16,9 +16,5 @@ namespace DoAn_QuanLyBenhVien.Models
         public string DiaChi { get; set; }
         public string TienSuBenhLy { get; set; }
         public DateTime NgayTaoHoSo { get; set; }
-
-        public int? Tuoi => NgaySinh.HasValue
-            ? (int?)((DateTime.Today - NgaySinh.Value).Days / 365)
-            : null;
     }
 }
