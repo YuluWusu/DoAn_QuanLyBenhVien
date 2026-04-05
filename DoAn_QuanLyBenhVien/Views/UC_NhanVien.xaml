@@ -1,0 +1,392 @@
+<UserControl x:Class="DoAn_QuanLyBenhVien.Views.UC_NhanVien"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DoAn_QuanLyBenhVien.Views"
+             xmlns:vm="clr-namespace:DoAn_QuanLyBenhVien.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1080" Background="#0F1923" HorizontalAlignment="Stretch" 
+             VerticalAlignment="Stretch">
+    <UserControl.DataContext>
+      <vm:DSNhanVienViewModel/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" 
+                        Background="{TemplateBinding Background}" 
+                        BorderThickness="0">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        </Style>
+        <Style TargetType="DataGridRow">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2D4A6E"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#1F3550"/>
+            </Style.Resources>
+
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#25354A"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type DatePickerTextBox}">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePicker">
+                        <Border Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="4">
+                            <Grid x:Name="PART_Root">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <DatePickerTextBox x:Name="PART_TextBox" 
+                                           Grid.Column="0" 
+                                           HorizontalContentAlignment="Stretch" 
+                                           VerticalContentAlignment="Center" 
+                                           Focusable="{TemplateBinding Focusable}"/>
+
+                                <Button x:Name="PART_Button" Grid.Column="1" 
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="#6B8299" Margin="2,0,5,0"
+                                VerticalAlignment="Center">
+                                    <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" FontSize="14"/>
+                                </Button>
+
+                                <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" 
+                                        PlacementTarget="{Binding ElementName=PART_Root}" StaysOpen="False">
+                                    <Border Background="#1A2E45" BorderBrush="#1E3048" BorderThickness="1">
+                                        <Calendar x:Name="PART_Calendar" />
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Background" Value="#00C2A8"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="10,5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnGhost" TargetType="Button">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="#6B8299"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="contentPresenter" 
+                                      Focusable="False" 
+                                      HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center" 
+                                      Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#25405D"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#00C2A8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#0F1923"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                                <Setter Property="Foreground" Value="#334455"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="#6B8299"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style x:Key="CboDark" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="templateRoot" Background="{TemplateBinding Background}" 
+                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter x:Name="contentPresenter" Content="{TemplateBinding SelectionBoxItem}"
+                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                              Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False"/>
+
+                                <ToggleButton Grid.ColumnSpan="2" Background="Transparent" BorderThickness="0"
+                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                                <Path x:Name="arrow" Grid.Column="1" Fill="#6B8299" HorizontalAlignment="Center" 
+                  VerticalAlignment="Center" Data="M0,0 L4,4 L8,0 Z"/>
+                            </Grid>
+
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border x:Name="dropDownBorder" Background="#1A2E45" BorderThickness="1" BorderBrush="#1E3048" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer SnapsToDevicePixels="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="QUẢN LÝ DANH SÁCH BÁC SĨ" 
+               Foreground="White" FontSize="22" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Grid Width="180" Height="32">
+                    <TextBox x:Name="txtSearch" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" 
+                     Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" Padding="8,0" FontSize="12"/>
+                    <TextBlock IsHitTestVisible="False" Text="Tìm kiếm..." VerticalAlignment="Center" 
+                       Margin="10,0,0,0" Foreground="#6B8299" FontSize="12">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearch}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <Button Content="TÌM" Command="{Binding SearchCommand}" Style="{StaticResource BtnGhost}" Width="60" Height="32" Margin="5,0,0,0" FontSize="11"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Command="{Binding ThemCommand}" Style="{StaticResource BtnPrimary}" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="{Binding AddButtonText}" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding SuaCommand}" Style="{StaticResource BtnGhost}" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        
+                        <TextBlock Text="{Binding EditButtonText}" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding XoaCommand}" Style="{StaticResource BtnGhost}" Foreground="#FF4C4C" Width="75" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="XÓA" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding LuuCommand}" Style="{StaticResource BtnPrimary}" Background="#2D7FF9" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="LƯU LẠI" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#141E29" CornerRadius="8" Padding="5" Margin="0,0,0,20">
+            <DataGrid ItemsSource="{Binding ListNhanVien}" 
+                        SelectedItem="{Binding SelectedItem}" 
+                        x:Name="dgBacSi" 
+                        AutoGenerateColumns="False" 
+                        CanUserAddRows="False" 
+          
+                        HeadersVisibility="Column" 
+                        RowHeaderWidth="0"
+                        SelectionMode="Single"
+                        SelectionUnit="FullRow"
+          
+                        Background="Transparent" 
+                        BorderThickness="0" 
+                        Foreground="White"
+                        RowBackground="#1A2E45" 
+                        AlternatingRowBackground="#141E29"
+                        GridLinesVisibility="None" 
+                        RowHeight="45" 
+                        ColumnHeaderHeight="40">
+
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="#6B8299"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Padding" Value="10,0"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="#1E3048"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="MÃ NV" Binding="{Binding MaNV}" Width="80"/>
+
+                    <DataGridTextColumn Header="HỌ VÀ TÊN" Binding="{Binding HoTen}" Width="*"/>
+
+                    <DataGridTextColumn Header="NGÀY SINH" Binding="{Binding NgaySinh, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+
+                    <DataGridTextColumn Header="GIỚI TÍNH" Binding="{Binding GioiTinh}" Width="80"/>
+
+                    <DataGridTextColumn Header="CHUYÊN KHOA" Binding="{Binding TenChuyenKhoa}" Width="150"/>
+
+                    <DataGridTextColumn Header="CHỨC VỤ" Binding="{Binding ChucVu}" Width="120"/>
+
+                    <DataGridTextColumn Header="SỐ ĐIỆN THOẠI" Binding="{Binding SoDienThoai}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <Border Grid.Row="3" Background="#141E29" CornerRadius="8" Padding="15" Margin="0,15,0,0">
+            <StackPanel>
+                <TextBlock Text="THÔNG TIN CHI TIẾT NHÂN VIÊN" Foreground="#00C2A8" FontWeight="Bold" Margin="5,0,0,15"/>
+
+                <UniformGrid Columns="3">
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Mã nhân viên" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding MaNV}" IsEnabled="{Binding IsAdding}" x:Name="txtMaNV" Height="32" Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Họ tên nhân viên" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding HoTen}" IsEnabled="{Binding IsInputEnabled}" x:Name="txtHoTen" Height="32" Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Ngày sinh" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <DatePicker x:Name="dpNgaySinh" SelectedDate="{Binding NgaySinh}" IsEnabled="{Binding IsInputEnabled}" Height="32" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Giới tính" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="cboGioiTinh" SelectedValue="{Binding GioiTinh}" SelectedValuePath="Content" IsEnabled="{Binding IsInputEnabled}"  Height="32" Style="{StaticResource CboDark}">
+                            <ComboBoxItem Content="Nam"/>
+                            <ComboBoxItem Content="Nữ"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Chuyên khoa" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding ListChuyenKhoa}" 
+                                  SelectedItem="{Binding SelectedChuyenKhoa}"
+                                  DisplayMemberPath="TenChuyenKhoa"
+                                  IsEnabled="{Binding IsInputEnabled}" x:Name="cboChuyenKhoa" Height="32" Style="{StaticResource CboDark}"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Chức vụ" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding ChucVu}" IsEnabled="{Binding IsInputEnabled}" x:Name="txtChucVu" Height="32" Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Số điện thoại" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtSDT" Text="{Binding SoDienThoai}" IsEnabled="{Binding IsInputEnabled}" Height="32" Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Email" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtEmail" Text="{Binding Email}" IsEnabled="{Binding IsInputEnabled}" Height="32" Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,5">
+                        <TextBlock Text="Mã chuyên khoa" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtMaCK" Text="{Binding MaCK}" Height="32" Background="#1A2E45" Foreground="Gray" 
+                         BorderBrush="#1E3048" VerticalContentAlignment="Center" Padding="5,0" 
+                         IsReadOnly="True" Cursor="No"/>
+                    </StackPanel>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
