@@ -23,11 +23,6 @@ namespace DoAn_QuanLyBenhVien.Views
         public UC_DanhSachBacSi()
         {
             InitializeComponent();
-            dgBacSi.ItemsSource = new List<object>
-    {
-        new { MaNV = "BS001", HoTen = "Nguyễn Ngọc Châu", TenCHUYENKHOA = "Nội Khoa", SoDienThoai = "0901234567" },
-        new { MaNV = "BS002", HoTen = "Lê Văn Tám", TenCHUYENKHOA = "Ngoại Khoa", SoDienThoai = "0988777666" }
-    };
         }
     }
 }
