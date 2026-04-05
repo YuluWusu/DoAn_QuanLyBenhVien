@@ -8,6 +8,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1100" Background="#0F1923" HorizontalAlignment="Stretch" 
              VerticalAlignment="Stretch">
+    <UserControl.DataContext>
+        <vm:DanhSachThuocViewModel/>
+    </UserControl.DataContext>
     <UserControl.Resources>
         <Style TargetType="{x:Type DatePickerTextBox}">
             <Setter Property="Background" Value="#1A2E45"/>
