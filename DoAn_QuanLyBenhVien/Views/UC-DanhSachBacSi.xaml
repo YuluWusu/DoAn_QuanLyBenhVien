@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DoAn_QuanLyBenhVien.Views"
              xmlns:vm="clr-namespace:DoAn_QuanLyBenhVien.ViewModels"
-             d:DataContext="{d:DesignInstance Type=vm:DSNhanVienViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1080" Background="#0F1923" HorizontalAlignment="Stretch" 
              VerticalAlignment="Stretch">
+    <UserControl.DataContext>
+      <vm:DSNhanVienViewModel/>
+    </UserControl.DataContext>
     <UserControl.Resources>
         <Style TargetType="DataGridCell">
             <Setter Property="Padding" Value="10,0"/>
