@@ -24,5 +24,6 @@ namespace DoAn_QuanLyBenhVien.Models
         public string TenThuoc { get; set; }
         public decimal? GiaBan { get; set; }
         public string DVT { get; set; }
+        public decimal ThanhTien => (GiaBan ?? 0) * SoLuong;
     }
  }
