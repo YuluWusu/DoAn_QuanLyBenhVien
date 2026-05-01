@@ -18,7 +18,6 @@ namespace DoAn_QuanLyBenhVien.Models
             get => _trangThai;
             set { _trangThai = value; OnPropertyChanged(); } 
         }
-        public string TrangThai { get; set; }
         public string TenThuNgan { get; set; }
         public string TenBenhNhan { get; set; }
         public decimal TongTien { get; set; }
