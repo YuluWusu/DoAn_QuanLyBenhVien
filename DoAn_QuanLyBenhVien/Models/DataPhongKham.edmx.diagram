@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d66a4939093842d1a2fcab9c33ddc9ac" Name="Diagram1">
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.BENHNHAN" Width="1.5" PointX="3" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.CHITIET_DONTHUOC" Width="1.5" PointX="7.5" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.CHUYENKHOA" Width="1.5" PointX="0.75" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.DICHVU" Width="1.5" PointX="5.25" PointY="14" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.DONTHUOC" Width="1.5" PointX="5.25" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.HOADON" Width="1.5" PointX="8.25" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.NHANVIEN" Width="1.5" PointX="3" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.PHIEUKHAM" Width="1.5" PointX="5.25" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.PHIEUKHAM_DICHVU" Width="1.5" PointX="7.5" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.QUYEN" Width="1.5" PointX="3" PointY="11.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.sysdiagram" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.TAIKHOAN" Width="1.5" PointX="5.25" PointY="10.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PHONG_KHAMModel.THUOC" Width="1.5" PointX="5.25" PointY="16.875" IsExpanded="true" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__PHIEUKHAM__MA_BE__3C69FB99" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__CHITIET_D__MA_DO__4D94879B" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__CHITIET_D__MA_TH__4E88ABD4" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK_NV_CK" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__PHIEUKHAM__MA_DI__4222D4EF" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__DONTHUOC__MA_PHI__46E78A0C" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__DONTHUOC__MANV_K__47DBAE45" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__DONTHUOC__MANV_X__48CFD27E" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__HOADON__MA_PHIEU__534D60F1" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__HOADON__MANV__5441852A" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__PHIEUKHAM__MANV__3D5E1FD2" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK_TK_NV" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK__PHIEUKHAM__MA_PH__412EB0B6" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PHONG_KHAMModel.FK_TK_QUYEN" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

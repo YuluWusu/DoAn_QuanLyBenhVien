@@ -1,0 +1,216 @@
+<UserControl x:Class="DoAn_QuanLyBenhVien.Views.UC_Thuoc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DoAn_QuanLyBenhVien.Views"
+             xmlns:vm="clr-namespace:DoAn_QuanLyBenhVien.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1100" Background="#0F1923" HorizontalAlignment="Stretch" 
+             VerticalAlignment="Stretch">
+    <UserControl.DataContext>
+        <vm:DanhSachThuocViewModel/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <Style x:Key="txtDark" TargetType="TextBox">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="5,0"/>
+        </Style>
+        
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Background" Value="#00C2A8"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BtnGhost" TargetType="Button">
+            <Setter Property="Background" Value="#1A2E45"/>
+            <Setter Property="Foreground" Value="#6B8299"/>
+            <Setter Property="BorderBrush" Value="#1E3048"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DataGridDark" TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="#15212F"/>
+            <Setter Property="AlternatingRowBackground" Value="#1A2E45"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#1E3048"/>
+                        <Setter Property="Foreground" Value="#6B8299"/>
+                        <Setter Property="Padding" Value="10,8"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,15" Orientation="Horizontal">
+            <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" Foreground="#6B8299" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBlock Text="DANH MỤC THUỐC" Foreground="White" FontSize="20" FontWeight="Bold"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Grid Width="200" Height="32">
+                    <TextBox x:Name="txtSearch" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" 
+                             Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" Padding="8,0" FontSize="12"/>
+                    <TextBlock IsHitTestVisible="False" Text="Tìm mã hoặc tên thuốc..." VerticalAlignment="Center" 
+                               Margin="10,0,0,0" Foreground="#6B8299" FontSize="12">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=txtSearch}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <Button Command="{Binding SearchCommand}" Style="{StaticResource BtnGhost}" Width="65" Height="32" Margin="5,0,0,0" FontSize="11">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE71E;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="TÌM" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Command="{Binding ThemCommand}" Style="{StaticResource BtnPrimary}" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="{Binding AddButtonText}" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding SuaCommand}" Style="{StaticResource BtnGhost}" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding EditButtonText}" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding XoaCommand}" Style="{StaticResource BtnGhost}" Foreground="#FF4C4C" Width="75" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="XÓA" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding LuuCommand}" Style="{StaticResource BtnPrimary}" Background="#2D7FF9" Width="100" Height="32" Margin="4,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
+                        <TextBlock Text="LƯU LẠI" VerticalAlignment="Center" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- ✅ DataGrid binding đúng tên entity THUOC: MA_THUOC, TEN_THUOC, GIA_BAN, SOLUONG_TON -->
+        <DataGrid ItemsSource="{Binding ListThuoc}" SelectedItem="{Binding SelectedItem}" Grid.Row="2" 
+                  Style="{StaticResource DataGridDark}" Margin="0,0,0,10" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="MÃ THUỐC"   Binding="{Binding MA_THUOC}"  Width="100"/>
+                <DataGridTextColumn Header="TÊN THUỐC"  Binding="{Binding TEN_THUOC}" Width="*"/>
+                <DataGridTextColumn Header="GIÁ BÁN" Binding="{Binding GIA_BAN, StringFormat={}{0:N0}đ}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="Padding" Value="0,0,5,0"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="TỒN KHO"    Binding="{Binding SOLUONG_TON}" Width="90"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- ✅ Form chi tiết chỉ có những field tồn tại trong entity THUOC -->
+        <Border Grid.Row="3" Background="#141E29" CornerRadius="8" Padding="15" Margin="0,15,0,0">
+            <StackPanel>
+                <TextBlock Text="THÔNG TIN CHI TIẾT THUỐC" Foreground="#00C2A8" FontWeight="Bold" Margin="5,0,0,15"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10,5">
+                        <TextBlock Text="Mã thuốc" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtMaThuoc" Text="{Binding MaThuoc, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding IsAdding}" Height="32" Style="{StaticResource txtDark}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10,5">
+                        <TextBlock Text="Tên thuốc" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtTenThuoc" Text="{Binding TenThuoc, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding IsInputEnabled}" Height="32" Style="{StaticResource txtDark}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Margin="10,5">
+                        <TextBlock Text="Giá bán (đ)" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtGiaBan" Text="{Binding GiaBan, UpdateSourceTrigger=LostFocus, StringFormat={}{0:N0}}"
+                                 IsEnabled="{Binding IsInputEnabled}" Height="32" Style="{StaticResource txtDark}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Margin="10,5">
+                        <TextBlock Text="Số lượng tồn" Foreground="#6B8299" Margin="0,0,0,5"/>
+                        <TextBox x:Name="txtSoLuongTon" Text="{Binding SoLuongTon, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding IsInputEnabled}" Height="32" Style="{StaticResource txtDark}"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

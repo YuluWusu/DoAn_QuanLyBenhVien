@@ -1,0 +1,73 @@
+<UserControl x:Class="DoAn_QuanLyBenhVien.Views.UC_TrangChu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:DoAn_QuanLyBenhVien.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <vm:TrangChuViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Background="#0F172A">
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Tiêu đề -->
+            <TextBlock Grid.Row="0" Text="TỔNG QUAN PHÒNG KHÁM" 
+                       Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+            <!-- Thống kê Card -->
+            <UniformGrid Grid.Row="1" Columns="4" Rows="1">
+                
+                <!-- Card 1 -->
+                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="TỔNG BỆNH NHÂN" Foreground="#94A3B8" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding TongBenhNhan}" Foreground="#10B981" FontSize="36" FontWeight="Bold" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 2 -->
+                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="10,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="DOANH THU" Foreground="#94A3B8" FontSize="14" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <TextBlock Text="{Binding TongDoanhThu, StringFormat={}{0:N0}}" Foreground="#3B82F6" FontSize="36" FontWeight="Bold"/>
+                            <TextBlock Text=" đ" Foreground="#3B82F6" FontSize="20" VerticalAlignment="Bottom" Margin="5,0,0,5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 3 -->
+                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="10,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="ĐƠN THUỐC CHỜ XUẤT" Foreground="#94A3B8" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SoDonThuocCho}" Foreground="#F59E0B" FontSize="36" FontWeight="Bold" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Card 4 -->
+                <Border Background="#1E293B" CornerRadius="12" Padding="20" Margin="10,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="BỆNH NHÂN ĐANG CHỜ" Foreground="#94A3B8" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding SoBenhNhanCho}" Foreground="#EF4444" FontSize="36" FontWeight="Bold" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Placeholder cho biểu đồ -->
+            <Border Grid.Row="2" Background="#1E293B" CornerRadius="12" Margin="0,30,0,0">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="HỆ THỐNG QUẢN LÝ PHÒNG KHÁM V1.0" Foreground="#475569" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Chào mừng bạn đã trở lại." Foreground="#94A3B8" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
