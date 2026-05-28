@@ -39,9 +39,9 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 OnPropertyChanged();
                 if (_selectedDichVu != null && !_isAdding && !_isEditing)
                 {
-                    MaDichVu  = _selectedDichVu.MA_DICHVU?.Trim();
+                    MaDichVu = _selectedDichVu.MA_DICHVU?.Trim();
                     TenDichVu = _selectedDichVu.TEN_DICHVU;
-                    GiaDV     = _selectedDichVu.GIA_DV;
+                    GiaDV = _selectedDichVu.GIA_DV;
                     IsEditDeleteEnabled = true;
                 }
             }
@@ -74,13 +74,13 @@ namespace DoAn_QuanLyBenhVien.ViewModels
 
         public DichVuViewModel()
         {
-            // ✅ Load từ Database thật (không còn mock data)
+            // ✅ Load từ Database thật
             LoadData();
 
-            AddCommand    = new RelayCommand(ExecuteAdd);
+            AddCommand = new RelayCommand(ExecuteAdd);
             UpdateCommand = new RelayCommand(ExecuteUpdate, CanExecuteUpdateDelete);
             DeleteCommand = new RelayCommand(ExecuteDelete, CanExecuteUpdateDelete);
-            SaveCommand   = new RelayCommand(ExecuteSave, CanExecuteSave);
+            SaveCommand = new RelayCommand(ExecuteSave, CanExecuteSave);
 
             ResetUIState();
         }
@@ -105,6 +105,29 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             }
         }
 
+        // 🔄 CẬP NHẬT: Tự động phát sinh mã dịch vụ gồm 5 ký tự (DV + 3 chữ số) dựa trên tổng số phiếu + 1
+        private string GenerateNextMaDichVu()
+        {
+            try
+            {
+                using (var db = new QL_PHONG_KHAM())
+                {
+                    // Đếm tổng số lượng dịch vụ hiện có trong DB
+                    int currentCount = db.DICHVUs.Count();
+
+                    // Cộng dồn thêm 1 cho phiếu tiếp theo
+                    int nextNumber = currentCount + 1;
+
+                    // Định dạng chuẩn 3 chữ số để tổng chuỗi là 5 ký tự (Ví dụ: DV005)
+                    return $"DV{nextNumber:D3}";
+                }
+            }
+            catch
+            {
+                return "DV001";
+            }
+        }
+
         private void ExecuteAdd(object obj)
         {
             if (!_isAdding && !_isEditing)
@@ -112,6 +135,9 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 IsAddingEditingState(true);
                 IsSaveEnabled = true; IsEditDeleteEnabled = false; IsEditable = true;
                 ClearFields();
+
+                // Tự động gán mã dịch vụ mới sinh ra khi nhấn Thêm
+                MaDichVu = GenerateNextMaDichVu();
             }
             else { IsAddingEditingState(false); ClearFields(); ResetUIState(); }
         }
@@ -133,7 +159,6 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 {
                     using (var db = new QL_PHONG_KHAM())
                     {
-                        // ✅ Xóa khỏi Database
                         var dv = db.DICHVUs.Find(SelectedDichVu.MA_DICHVU);
                         if (dv != null)
                         {
@@ -165,28 +190,39 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                             return;
                         }
                         var newDV = new DICHVU { MA_DICHVU = MaDichVu, TEN_DICHVU = TenDichVu, GIA_DV = GiaDV };
-                        // ✅ Thêm vào Database
                         db.DICHVUs.Add(newDV);
                         db.SaveChanges();
                         DanhSachDichVu.Add(newDV);
                     }
                     else if (_isEditing && SelectedDichVu != null)
                     {
-                        // ✅ Cập nhật vào Database
                         var existing = db.DICHVUs.Find(SelectedDichVu.MA_DICHVU);
                         if (existing != null)
                         {
                             existing.TEN_DICHVU = TenDichVu;
-                            existing.GIA_DV     = GiaDV;
+                            existing.GIA_DV = GiaDV;
                             db.Entry(existing).State = EntityState.Modified;
                             db.SaveChanges();
 
-                            // Cập nhật UI collection
                             var uiItem = DanhSachDichVu.FirstOrDefault(x => x.MA_DICHVU == SelectedDichVu.MA_DICHVU);
                             if (uiItem != null) { uiItem.TEN_DICHVU = TenDichVu; uiItem.GIA_DV = GiaDV; }
                         }
                     }
                 }
+            }
+            // ✅ Đổi catch để bắt chi tiết thuộc tính nào lỗi nếu có phát sinh sau này
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                string errorMessages = "";
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        errorMessages += $"Trường: {validationError.PropertyName} - Lỗi: {validationError.ErrorMessage}\n";
+                    }
+                }
+                MessageBox.Show("Lỗi Validation dữ liệu:\n" + errorMessages, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (Exception ex)
             {
@@ -196,7 +232,7 @@ namespace DoAn_QuanLyBenhVien.ViewModels
 
             MessageBox.Show("Lưu thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
             IsAddingEditingState(false); ResetUIState(); ClearFields();
-            LoadData(); // Refresh lại danh sách
+            LoadData(); // Refresh lại danh sách hiển thị
         }
 
         private bool CanExecuteSave(object obj)
