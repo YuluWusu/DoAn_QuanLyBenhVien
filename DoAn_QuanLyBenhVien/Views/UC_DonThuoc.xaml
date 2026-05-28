@@ -14,34 +14,29 @@
     </UserControl.DataContext>
 
     <UserControl.Resources>
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
+        <Style x:Key="DarkTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#334155"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#475569"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#2D4A6E"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Padding" Value="8,5"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="CaretBrush" Value="#00C2A8"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="border" 
-                            Background="{TemplateBinding Background}" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
-                            BorderThickness="{TemplateBinding BorderThickness}" 
-                            CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="5">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#00C2A8"/>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#10B981"/>
                             </Trigger>
-                            <Trigger Property="IsFocused" Value="true">
-                                <Setter TargetName="border" Property="BorderBrush" Value="#00C2A8"/>
-                            </Trigger>
-                            <Trigger Property="IsReadOnly" Value="true">
-                                <Setter TargetName="border" Property="Background" Value="#F0F0F0"/>
-                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="Background" Value="#1E293B"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -55,23 +50,6 @@
                     <Setter Property="Opacity" Value="0.5"/>
                 </Trigger>
             </Style.Triggers>
-        </Style>
-
-        <Style TargetType="Button">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.4"/>
-                    <Setter Property="Background" Value="Gray"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
-        <Style TargetType="ComboBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="BorderBrush" Value="#2D4A6E"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <Style TargetType="DatePicker">
@@ -137,6 +115,55 @@
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="BorderBrush" Value="#00C2A8"/>
         </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#334155"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#7F1D1D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#B91C1C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SaveButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3B82F6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="WarningButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#F59E0B"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.3"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="20">
@@ -149,39 +176,38 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Border Background="#162431" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#253D5C" BorderThickness="1">
-                        <WrapPanel>
-                            <StackPanel Margin="0,0,20,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,20,10" Grid.Column="0">
                                 <TextBlock Text="Mã Đơn Thuốc" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="120" Height="32" Text="{Binding MaDonThuocMoi}" IsEnabled="{Binding IsProcessing}"/>
+                                <TextBox Height="32" Text="{Binding MaDonThuocMoi}" IsReadOnly="True" Style="{StaticResource DarkTextBox}"/>
                             </StackPanel>
-                            <StackPanel Margin="0,0,20,10">
+                            <StackPanel Margin="0,0,20,10" Grid.Column="1">
                                 <TextBlock Text="Mã Phiếu Khám" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="120" Height="32" Text="{Binding MaPhieuKhamMoi}" IsEnabled="{Binding IsProcessing}"/>
+                                <ComboBox ItemsSource="{Binding DanhSachPhieuKhamCbo}" SelectedItem="{Binding SelectedPhieuKhamCbo}" IsEnabled="{Binding IsProcessing}" DisplayMemberPath="MA_PHIEUKHAM" SelectedValuePath="MA_PHIEUKHAM" Height="30"/>
                             </StackPanel>
-                            <StackPanel Margin="0,0,20,10">
-                                <TextBlock Text="Ngày Kê" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <DatePicker Width="150" Height="32" SelectedDate="{Binding NgayKeMoi}" IsEnabled="{Binding IsProcessing}"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,20,10">
-                                <TextBlock Text="Mã NV Kê" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="100" Height="32" Text="{Binding MaNV_KeMoi}" IsEnabled="{Binding IsProcessing}"/>
-                            </StackPanel>
-                        </WrapPanel>
+                        </Grid>
                     </Border>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15" HorizontalAlignment="Center">
-                        <Button Content="{Binding AddButtonContent}" Command="{Binding AddCommand}" Width="90" Margin="0,0,10,0" Background="#00C2A8" Foreground="White"/>
-                        <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="90" Margin="0,0,10,0" Background="#FFB900" Foreground="White"/>
-                        <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="90" Margin="0,0,10,0" Background="#FF4655" Foreground="White"/>
-                        <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="90" Background="#2196F3" Foreground="White" Margin="0,0,10,0"/>
-                        <Button Content="💊 Kê Thuốc" Command="{Binding ChiTietCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Background="#8E2DE2" Foreground="White" FontWeight="Bold"/>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
+                        <Button Content="{Binding AddButtonContent}" Command="{Binding AddCommand}" Width="110" Height="35" Margin="0,0,10,0" Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
+
+                        <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource ActionButtonStyle}"/>
+
+                        <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource DangerButtonStyle}"/>
+
+                        <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="130" Height="35" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
                     </StackPanel>
+
                     <DataGrid Grid.Row="2" ItemsSource="{Binding DanhSachDonThuoc}" SelectedItem="{Binding SelectedDonThuoc}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Mã Đơn" Binding="{Binding MaDonThuoc}" Width="100"/>
-                            <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding MaPhieuKham}" Width="100"/>
-                            <DataGridTextColumn Header="Ngày Kê" Binding="{Binding NgayKe, StringFormat='dd/MM/yyyy'}" Width="120"/>
-                            <DataGridTextColumn Header="Mã NV" Binding="{Binding MaNV_Ke}" Width="100"/>
-                            <DataGridTextColumn Header="Bác Sĩ Kê" Binding="{Binding TenBacSiKe}" Width="*"/>
+                            <DataGridTextColumn Header="Mã Đơn" Binding="{Binding MaDonThuoc}" Width="*"/>
+                            <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding MaPhieuKham}" Width="*"/>
+                            <DataGridTextColumn Header="Ngày Kê" Binding="{Binding NgayKe, StringFormat='dd/MM/yyyy'}" Width="*"/>
+                            <DataGridTextColumn Header="Mã NV Kê" Binding="{Binding MaNV_Ke}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -189,62 +215,58 @@
             <TabItem Header="CHI TIẾT ĐƠN THUỐC">
 
                 <Grid Margin="0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="1021*"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Background="#162431" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#253D5C" BorderThickness="1">
+                    <Border Background="#162431" CornerRadius="8" Padding="15" Margin="0,0,0,200" BorderBrush="#253D5C" BorderThickness="1" Grid.ColumnSpan="2">
                         <WrapPanel>
                             <StackPanel Margin="0,0,20,10">
                                 <TextBlock Text="Mã Đơn Thuốc" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="100" Height="32" Text="{Binding SelectedDonThuoc.MaDonThuoc}" IsReadOnly="True"/>
+                                <TextBox Width="200" Height="32" Text="{Binding SelectedDonThuoc.MaDonThuoc}" IsReadOnly="True" Style="{StaticResource DarkTextBox}"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,0,20,10">
                                 <TextBlock Text="Chọn Thuốc" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <ComboBox Width="200" Height="32" ItemsSource="{Binding DanhSachThuocGoc}" IsEnabled="{Binding IsProcessing}"
-                                        SelectedItem="{Binding SelectedThuocHienTai}" DisplayMemberPath="TenThuoc"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,0,20,10">
-                                <TextBlock Text="ĐVT" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="60" Height="32" Text="{Binding DVTMoi}" IsReadOnly="True"/>
+                                <ComboBox Width="250" Height="32" ItemsSource="{Binding DanhSachThuocGoc}" IsEnabled="{Binding IsProcessing}"
+                                        SelectedItem="{Binding SelectedThuocHienTai}" DisplayMemberPath="TenThuoc" />
                             </StackPanel>
 
                             <StackPanel Margin="0,0,20,10">
                                 <TextBlock Text="Số Lượng" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="70" Height="32" Text="{Binding SoLuongMoi, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsProcessing}"/>
+                                <TextBox Width="70" Height="32" Text="{Binding SoLuongMoi, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsProcessing}" Style="{StaticResource DarkTextBox}"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,0,20,10">
-                                <TextBlock Text="Giá Bán" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="90" Height="32" Text="{Binding GiaBanMoi, StringFormat='N0'}" IsReadOnly="True"/>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,0,20,10">
-                                <TextBlock Text="Liều Dùng" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
-                                <TextBox Width="220" Height="32" Text="{Binding LieuDungMoi, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsProcessing}"/>
+                                <TextBlock Text="Thành Tiền" Foreground="#00C2A8" Margin="0,0,0,5" FontSize="11"/>
+                                <TextBox Width="90" Height="32" Text="{Binding ThanhTienMoi, StringFormat='N0'}" IsReadOnly="True" Style="{StaticResource DarkTextBox}"/>
                             </StackPanel>
                         </WrapPanel>
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15" HorizontalAlignment="Center">
-                        <Button Content="➕ Thêm" Command="{Binding AddCommand}" Width="90" Margin="0,0,10,0" Background="#00C2A8" Foreground="White"/>
-                        <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="90" Margin="0,0,10,0" Background="#FFB900" Foreground="Black"/>
-                        <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="90" Margin="0,0,10,0" Background="#FF4655" Foreground="White"/>
-                        <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="90" Background="#2196F3" Foreground="White"/>
+                    <StackPanel Orientation="Horizontal" Margin="243,109,0,150" HorizontalAlignment="Left" Grid.Column="1">
+                        <Button Content="{Binding AddButtonContent}" Command="{Binding AddCommand}" Width="110" Height="35" Margin="0,0,10,0" Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
+
+                        <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource ActionButtonStyle}"/>
+
+                        <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource DangerButtonStyle}"/>
+
+                        <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="130" Height="35" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
                     </StackPanel>
 
-                    <DataGrid Grid.Row="2" ItemsSource="{Binding DanhSachChiTietDon_HienThi}" SelectedItem="{Binding SelectedChiTiet}" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid ItemsSource="{Binding DanhSachChiTietDon_HienThi}" SelectedItem="{Binding SelectedChiTiet}" AutoGenerateColumns="False" IsReadOnly="True" Grid.ColumnSpan="2" Margin="0,164,0,0" Grid.RowSpan="3">
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="Mã Đơn Thuốc" Binding="{Binding MaDonThuoc}" Width="100"/>
                             <DataGridTextColumn Header="Mã Thuốc" Binding="{Binding MaThuoc}" Width="100"/>
                             <DataGridTextColumn Header="Tên Thuốc" Binding="{Binding TenThuoc}" Width="2*"/>
                             <DataGridTextColumn Header="Số Lượng" Binding="{Binding SoLuong}" Width="80"/>
-                            <DataGridTextColumn Header="ĐVT" Binding="{Binding DVT}" Width="70"/>
-                            <DataGridTextColumn Header="Giá Bán" Binding="{Binding GiaBan, StringFormat='N0'}" Width="100"/>
-                            <DataGridTextColumn Header="Liều Dùng" Binding="{Binding LieuDung}" Width="2.5*"/>
+                            <DataGridTextColumn Header="Thành Tiền" Binding="{Binding ThanhTien, StringFormat={}{0:N0} VNĐ}" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
