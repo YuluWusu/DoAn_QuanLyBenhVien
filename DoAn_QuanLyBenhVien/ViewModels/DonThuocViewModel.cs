@@ -33,6 +33,34 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             set { _danhSachBacSi = value; OnPropertyChanged(); }
         }
 
+        // ✅ THÊM: Nguồn dữ liệu Phiếu Khám cho ComboBox trên giao diện đơn thuốc
+        private ObservableCollection<PHIEUKHAM> _danhSachPhieuKhamCbo;
+        public ObservableCollection<PHIEUKHAM> DanhSachPhieuKhamCbo
+        {
+            get => _danhSachPhieuKhamCbo;
+            set { _danhSachPhieuKhamCbo = value; OnPropertyChanged(); }
+        }
+
+        // ✅ THÊM: Đối tượng Phiếu Khám được chọn từ ComboBox
+        private PHIEUKHAM _selectedPhieuKhamCbo;
+        public PHIEUKHAM SelectedPhieuKhamCbo
+        {
+            get => _selectedPhieuKhamCbo;
+            set
+            {
+                _selectedPhieuKhamCbo = value;
+                OnPropertyChanged();
+                if (_selectedPhieuKhamCbo != null)
+                {
+                    _maPhieuKhamMoi = _selectedPhieuKhamCbo.MA_PHIEUKHAM;
+                }
+                else
+                {
+                    _maPhieuKhamMoi = "";
+                }
+            }
+        }
+
         // -------------------------------------------------------------------
         // Trạng thái Tab
         // -------------------------------------------------------------------
@@ -55,11 +83,11 @@ namespace DoAn_QuanLyBenhVien.ViewModels
         private string _addButtonContent = "➕ Thêm";
         public string AddButtonContent { get => _addButtonContent; set { _addButtonContent = value; OnPropertyChanged(); } }
 
-        private bool _isSaveEnabled = false;
-        public bool IsSaveEnabled { get => _isSaveEnabled; set { _isSaveEnabled = value; OnPropertyChanged(); } }
+        private bool _saveButtonVisibility = false;
+        public bool SaveButtonVisibility { get => _saveButtonVisibility; set { _saveButtonVisibility = value; OnPropertyChanged(); } }
 
-        private bool _isEditDeleteEnabled = false;
-        public bool IsEditDeleteEnabled { get => _isEditDeleteEnabled; set { _isEditDeleteEnabled = value; OnPropertyChanged(); } }
+        private bool _editDeleteVisibility = false;
+        public bool EditDeleteVisibility { get => _editDeleteVisibility; set { _editDeleteVisibility = value; OnPropertyChanged(); } }
 
         private bool _isAdding = false;
         private bool _isEditing = false;
@@ -74,7 +102,21 @@ namespace DoAn_QuanLyBenhVien.ViewModels
         public string MaDonThuocMoi { get => _maDonThuocMoi; set { _maDonThuocMoi = value; OnPropertyChanged(); } }
 
         private string _maPhieuKhamMoi;
-        public string MaPhieuKhamMoi { get => _maPhieuKhamMoi; set { _maPhieuKhamMoi = value; OnPropertyChanged(); } }
+        public string MaPhieuKhamMoi
+        {
+            get => _maPhieuKhamMoi;
+            set
+            {
+                _maPhieuKhamMoi = value;
+                OnPropertyChanged();
+                // Đồng bộ ngược lại ComboBox nếu mã này thay đổi từ code (khi chọn dòng trên Grid)
+                if (DanhSachPhieuKhamCbo != null && !string.IsNullOrEmpty(_maPhieuKhamMoi))
+                {
+                    var pk = DanhSachPhieuKhamCbo.FirstOrDefault(x => x.MA_PHIEUKHAM?.Trim() == _maPhieuKhamMoi.Trim());
+                    if (SelectedPhieuKhamCbo != pk) _selectedPhieuKhamCbo = pk; OnPropertyChanged(nameof(SelectedPhieuKhamCbo));
+                }
+            }
+        }
 
         private DateTime _ngayKeMoi = DateTime.Now;
         public DateTime NgayKeMoi { get => _ngayKeMoi; set { _ngayKeMoi = value; OnPropertyChanged(); } }
@@ -107,13 +149,13 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 OnPropertyChanged();
                 if (_selectedDonThuoc != null)
                 {
-                    MaDonThuocMoi  = _selectedDonThuoc.MaDonThuoc;
-                    MaPhieuKhamMoi = _selectedDonThuoc.MaPhieuKham;
-                    NgayKeMoi      = _selectedDonThuoc.NgayKe;
-                    MaNV_KeMoi     = _selectedDonThuoc.MaNV_Ke;
-                    SelectedBacSi  = DanhSachBacSi?.FirstOrDefault(x => x.MaNV?.Trim().ToUpper() == _selectedDonThuoc.MaNV_Ke?.Trim().ToUpper());
+                    MaDonThuocMoi = _selectedDonThuoc.MaDonThuoc;
+                    MaPhieuKhamMoi = _selectedDonThuoc.MaPhieuKham; // Kích hoạt đồng bộ ComboBox
+                    NgayKeMoi = _selectedDonThuoc.NgayKe;
+                    MaNV_KeMoi = _selectedDonThuoc.MaNV_Ke;
+                    SelectedBacSi = DanhSachBacSi?.FirstOrDefault(x => x.MaNV?.Trim().ToUpper() == _selectedDonThuoc.MaNV_Ke?.Trim().ToUpper());
                     LọcChiTietDonThuoc();
-                    IsEditDeleteEnabled = true;
+                    EditDeleteVisibility = true;
                 }
             }
         }
@@ -132,10 +174,38 @@ namespace DoAn_QuanLyBenhVien.ViewModels
         public string DVTMoi { get => _dvtMoi; set { _dvtMoi = value; OnPropertyChanged(); } }
 
         private int _soLuongMoi;
-        public int SoLuongMoi { get => _soLuongMoi; set { _soLuongMoi = value; OnPropertyChanged(); } }
+        public int SoLuongMoi
+        {
+            get => _soLuongMoi;
+            set
+            {
+                _soLuongMoi = value;
+                OnPropertyChanged();
+                // 💥 Đã chuyển đổi: Tự động tính toán thành tiền khi thay đổi số lượng
+                ThanhTienMoi = _soLuongMoi * _giaBanMoi;
+            }
+        }
 
         private decimal _giaBanMoi;
-        public decimal GiaBanMoi { get => _giaBanMoi; set { _giaBanMoi = value; OnPropertyChanged(); } }
+        public decimal GiaBanMoi
+        {
+            get => _giaBanMoi;
+            set
+            {
+                _giaBanMoi = value;
+                OnPropertyChanged();
+                // 💥 Đã chuyển đổi: Tự động tính toán thành tiền khi thay đổi giá bán gốc
+                ThanhTienMoi = _soLuongMoi * _giaBanMoi;
+            }
+        }
+
+        // 💥 Thuộc tính Binding trực tiếp vào TextBox hiển thị Thành Tiền trên Form nhập liệu
+        private decimal _thanhTienMoi;
+        public decimal ThanhTienMoi
+        {
+            get => _thanhTienMoi;
+            set { _thanhTienMoi = value; OnPropertyChanged(); }
+        }
 
         private string _lieuDungMoi;
         public string LieuDungMoi { get => _lieuDungMoi; set { _lieuDungMoi = value; OnPropertyChanged(); } }
@@ -165,11 +235,17 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 if (_selectedChiTiet != null)
                 {
                     MaThuocMoi = _selectedChiTiet.MaThuoc;
-                    DVTMoi     = _selectedChiTiet.DVT;
+                    SelectedThuocHienTai = DanhSachThuocGoc?.FirstOrDefault(x => x.MaThuoc == _selectedChiTiet.MaThuoc);
+                    DVTMoi = _selectedChiTiet.DVT;
                     SoLuongMoi = _selectedChiTiet.SoLuong;
+                    GiaBanMoi = _selectedChiTiet.GiaBan;
                     LieuDungMoi = _selectedChiTiet.LieuDung;
-                    IsEditDeleteEnabled = true;
-                    IsSaveEnabled = false;
+
+                    // 💥 Đã chuyển đổi: Gán trực tiếp giá trị tính toán vào thuộc tính ThanhTienMoi khi chọn dòng
+                    ThanhTienMoi = _selectedChiTiet.SoLuong * _selectedChiTiet.GiaBan;
+
+                    EditDeleteVisibility = true;
+                    SaveButtonVisibility = false;
                     IsAddingEditingState(false);
                 }
             }
@@ -186,8 +262,9 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 if (_selectedThuocHienTai != null)
                 {
                     MaThuocMoi = _selectedThuocHienTai.MaThuoc;
-                    DVTMoi     = _selectedThuocHienTai.DVT;
-                    GiaBanMoi  = _selectedThuocHienTai.GiaBan;
+                    DVTMoi = _selectedThuocHienTai.DVT;
+                    GiaBanMoi = _selectedThuocHienTai.GiaBan;
+                    // Sau khi cập nhật GiaBanMoi tại đây, hàm set của GiaBanMoi sẽ tự động kích hoạt tính lại ThanhTienMoi
                 }
             }
         }
@@ -203,16 +280,15 @@ namespace DoAn_QuanLyBenhVien.ViewModels
 
         public DonThuocViewModel()
         {
-            AddCommand     = new RelayCommand(ExecuteAdd);
-            UpdateCommand  = new RelayCommand(ExecuteUpdate, CanExecuteUpdateDelete);
-            DeleteCommand  = new RelayCommand(ExecuteDelete, CanExecuteUpdateDelete);
-            SaveCommand    = new RelayCommand(ExecuteSave, CanExecuteSave);
+            AddCommand = new RelayCommand(ExecuteAdd);
+            UpdateCommand = new RelayCommand(ExecuteUpdate, CanExecuteUpdateDelete);
+            DeleteCommand = new RelayCommand(ExecuteDelete, CanExecuteUpdateDelete);
+            SaveCommand = new RelayCommand(ExecuteSave, CanExecuteSave);
             ChiTietCommand = new RelayCommand(ExecuteChiTiet, CanExecuteChiTiet);
 
-            // ✅ Load từ Database thật
             LoadData();
             SelectedDonThuoc = null;
-            SelectedChiTiet  = null;
+            SelectedChiTiet = null;
             ClearFields();
             ResetUIState();
         }
@@ -225,20 +301,53 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             if (!_isAdding && !_isEditing)
             {
                 IsAddingEditingState(true);
-                IsSaveEnabled = true; IsEditDeleteEnabled = false;
+                SaveButtonVisibility = true; EditDeleteVisibility = false;
                 AddButtonContent = "❌ Hủy"; ClearFields();
                 if (SelectedTabIndex == 0)
                 {
-                    MaDonThuocMoi = "DT" + DateTime.Now.ToString("HHmmssff");
+                    // ✅ THAY THẾ: Logic sinh mã cộng dồn DT0001, DT0002 thay vì dùng thời gian
+                    MaDonThuocMoi = SinhMaDonThuocTuDong();
+                    MaNV_KeMoi = LoginViewModel.MaNVHienTai;
+                    NgayKeMoi = DateTime.Now;
                 }
             }
             else { IsAddingEditingState(false); ResetUIState(); ClearFields(); }
         }
 
+        // ✅ THÊM: Hàm tính toán mã đơn thuốc tăng tiến dạng DTxxxx
+        private string SinhMaDonThuocTuDong()
+        {
+            try
+            {
+                using (var db = new QL_PHONG_KHAM())
+                {
+                    var danhSachMa = db.DONTHUOCs.Select(x => x.MA_DONTHUOC).ToList();
+                    int maxNumber = 0;
+
+                    foreach (var ma in danhSachMa)
+                    {
+                        if (string.IsNullOrWhiteSpace(ma) || ma.Length < 3) continue;
+                        string soDuoi = ma.Substring(2).Trim();
+                        if (int.TryParse(soDuoi, out int currentNumber))
+                        {
+                            if (currentNumber > maxNumber) maxNumber = currentNumber;
+                        }
+                    }
+
+                    int extension = maxNumber + 1;
+                    return "DT" + extension.ToString("D4"); // Định dạng đủ 4 chữ số (ví dụ: DT0001)
+                }
+            }
+            catch
+            {
+                return "DT" + new Random().Next(1000, 9999).ToString(); // Dự phòng lỗi kết nối
+            }
+        }
+
         private void ExecuteUpdate(object obj)
         {
             _isEditing = true; IsProcessing = true;
-            IsSaveEnabled = true; IsEditDeleteEnabled = false;
+            SaveButtonVisibility = true; EditDeleteVisibility = false;
             AddButtonContent = "❌ Hủy";
         }
 
@@ -253,7 +362,6 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                     {
                         using (var db = new QL_PHONG_KHAM())
                         {
-                            // ✅ Xóa CHITIET trước, sau đó xóa DONTHUOC
                             var chitiets = db.CHITIET_DONTHUOC.Where(x => x.MA_DONTHUOC == SelectedDonThuoc.MaDonThuoc).ToList();
                             db.CHITIET_DONTHUOC.RemoveRange(chitiets);
                             var dt = db.DONTHUOCs.Find(SelectedDonThuoc.MaDonThuoc);
@@ -275,10 +383,9 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 {
                     using (var db = new QL_PHONG_KHAM())
                     {
-                        // ✅ Xóa chi tiết đơn thuốc khỏi DB (tìm bằng FirstOrDefault vì composite key)
                         var ct = db.CHITIET_DONTHUOC.FirstOrDefault(x =>
                             x.MA_DONTHUOC == SelectedChiTiet.MaDonThuoc &&
-                            x.MA_THUOC    == SelectedChiTiet.MaThuoc);
+                            x.MA_THUOC == SelectedChiTiet.MaThuoc);
                         if (ct != null) { db.CHITIET_DONTHUOC.Remove(ct); db.SaveChanges(); }
                     }
                     _toanBoChiTietDon.Remove(SelectedChiTiet);
@@ -296,7 +403,7 @@ namespace DoAn_QuanLyBenhVien.ViewModels
         {
             if (!_isAdding && !_isEditing) return false;
             if (SelectedTabIndex == 0)
-                return !string.IsNullOrWhiteSpace(MaDonThuocMoi) && !string.IsNullOrWhiteSpace(MaPhieuKhamMoi);
+                return !string.IsNullOrWhiteSpace(MaDonThuocMoi) && SelectedPhieuKhamCbo != null; // Kiểm tra qua ComboBox bệnh nhân
             else
                 return !string.IsNullOrWhiteSpace(MaThuocMoi) && SoLuongMoi > 0;
         }
@@ -317,42 +424,41 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                 {
                     if (SelectedTabIndex == 0)
                     {
-                        var bsThat = DanhSachBacSi?.FirstOrDefault(x => x.MaNV?.Trim().ToUpper() == MaNV_KeMoi?.Trim().ToUpper());
-                        if (bsThat == null)
-                        { MessageBox.Show("Mã nhân viên không tồn tại!"); return; }
-
-                        string tenHienThi = SelectedBacSi?.HoTen ?? bsThat.HoTen;
+                        string tenHienThi = LoginViewModel.HoTenHienTai ?? MaNV_KeMoi;
 
                         if (_isAdding)
                         {
-                            // ✅ Kiểm tra mã phiếu khám tồn tại
                             if (!db.PHIEUKHAMs.Any(x => x.MA_PHIEUKHAM == MaPhieuKhamMoi))
-                            { MessageBox.Show("Mã phiếu khám không tồn tại trong hệ thống!"); return; }
+                            {
+                                MessageBox.Show("Mã phiếu khám không tồn tại trong hệ thống!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
 
                             var newDT = new DONTHUOC
                             {
-                                MA_DONTHUOC  = MaDonThuocMoi,
+                                MA_DONTHUOC = MaDonThuocMoi,
                                 MA_PHIEUKHAM = MaPhieuKhamMoi,
-                                MANV_KE      = MaNV_KeMoi,
-                                TRANGTHAI    = "Chờ xuất"
+                                MANV_KE = MaNV_KeMoi,
+                                TRANGTHAI = "Chờ xuất"
                             };
                             db.DONTHUOCs.Add(newDT);
                             db.SaveChanges();
 
                             DanhSachDonThuoc.Add(new DonThuocLocal
                             {
-                                MaDonThuoc = MaDonThuocMoi, MaPhieuKham = MaPhieuKhamMoi,
-                                NgayKe = NgayKeMoi, MaNV_Ke = MaNV_KeMoi, TenBacSiKe = tenHienThi
+                                MaDonThuoc = MaDonThuocMoi,
+                                MaPhieuKham = MaPhieuKhamMoi,
+                                NgayKe = NgayKeMoi,
+                                MaNV_Ke = MaNV_KeMoi,
+                                TenBacSiKe = tenHienThi
                             });
                         }
                         else if (_isEditing && SelectedDonThuoc != null)
                         {
-                            // ✅ Cập nhật DB
                             var dt = db.DONTHUOCs.Find(SelectedDonThuoc.MaDonThuoc);
                             if (dt != null)
                             {
                                 dt.MA_PHIEUKHAM = MaPhieuKhamMoi;
-                                dt.MANV_KE      = MaNV_KeMoi;
                                 db.Entry(dt).State = EntityState.Modified;
                                 db.SaveChanges();
 
@@ -361,8 +467,11 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                                 {
                                     var updated = new DonThuocLocal
                                     {
-                                        MaDonThuoc = MaDonThuocMoi, MaPhieuKham = MaPhieuKhamMoi,
-                                        NgayKe = NgayKeMoi, MaNV_Ke = MaNV_KeMoi, TenBacSiKe = tenHienThi
+                                        MaDonThuoc = MaDonThuocMoi,
+                                        MaPhieuKham = MaPhieuKhamMoi,
+                                        NgayKe = SelectedDonThuoc.NgayKe,
+                                        MaNV_Ke = SelectedDonThuoc.MaNV_Ke,
+                                        TenBacSiKe = SelectedDonThuoc.TenBacSiKe
                                     };
                                     DanhSachDonThuoc[idx] = updated;
                                     SelectedDonThuoc = updated;
@@ -382,40 +491,43 @@ namespace DoAn_QuanLyBenhVien.ViewModels
                                 return;
                             }
 
-                            // ✅ Thêm chi tiết đơn thuốc vào DB
                             db.CHITIET_DONTHUOC.Add(new CHITIET_DONTHUOC
                             {
                                 MA_DONTHUOC = SelectedDonThuoc.MaDonThuoc,
-                                MA_THUOC    = MaThuocMoi,
-                                SOLUONG     = SoLuongMoi,
+                                MA_THUOC = MaThuocMoi,
+                                SOLUONG = SoLuongMoi,
                                 GIA_LUC_BAN = GiaBanMoi
                             });
                             db.SaveChanges();
 
                             _toanBoChiTietDon.Add(new ChiTietDonThuocLocal
                             {
-                                MaDonThuoc = SelectedDonThuoc.MaDonThuoc, MaThuoc = MaThuocMoi,
-                                TenThuoc = thuocInfo?.TenThuoc, DVT = DVTMoi,
-                                SoLuong = SoLuongMoi, GiaBan = GiaBanMoi, LieuDung = LieuDungMoi
+                                MaDonThuoc = SelectedDonThuoc.MaDonThuoc,
+                                MaThuoc = MaThuocMoi,
+                                TenThuoc = thuocInfo?.TenThuoc,
+                                DVT = DVTMoi,
+                                SoLuong = SoLuongMoi,
+                                GiaBan = GiaBanMoi,
+                                LieuDung = LieuDungMoi
                             });
                         }
                         else if (_isEditing && SelectedChiTiet != null)
                         {
-                            // ✅ Cập nhật chi tiết trong DB
                             var ct = db.CHITIET_DONTHUOC.Find(SelectedChiTiet.MaDonThuoc, SelectedChiTiet.MaThuoc);
                             if (ct != null)
                             {
-                                ct.SOLUONG     = SoLuongMoi;
+                                ct.SOLUONG = SoLuongMoi;
                                 ct.GIA_LUC_BAN = GiaBanMoi;
                                 db.Entry(ct).State = EntityState.Modified;
                                 db.SaveChanges();
                             }
-                            SelectedChiTiet.MaThuoc  = MaThuocMoi;
-                            SelectedChiTiet.TenThuoc  = thuocInfo?.TenThuoc;
-                            SelectedChiTiet.DVT       = DVTMoi;
-                            SelectedChiTiet.SoLuong   = SoLuongMoi;
-                            SelectedChiTiet.GiaBan    = GiaBanMoi;
-                            SelectedChiTiet.LieuDung  = LieuDungMoi;
+                            SelectedChiTiet.MaThuoc = MaThuocMoi;
+                            SelectedChiTiet.TenThuoc = thuocInfo?.TenThuoc;
+                            SelectedChiTiet.DVT = DVTMoi;
+                            SelectedChiTiet.SoLuong = SoLuongMoi;
+                            SelectedChiTiet.GiaBan = GiaBanMoi;
+                            SelectedChiTiet.LieuDung = LieuDungMoi;
+
                             var idx = _toanBoChiTietDon.IndexOf(SelectedChiTiet);
                             if (idx >= 0) _toanBoChiTietDon[idx] = SelectedChiTiet;
                         }
@@ -470,20 +582,25 @@ namespace DoAn_QuanLyBenhVien.ViewModels
 
         private void ResetUIState()
         {
-            AddButtonContent = "➕ Thêm"; IsSaveEnabled = false;
-            IsEditDeleteEnabled = (SelectedDonThuoc != null || SelectedChiTiet != null);
+            AddButtonContent = "➕ Thêm"; SaveButtonVisibility = false;
+            EditDeleteVisibility = (SelectedDonThuoc != null || SelectedChiTiet != null);
             IsProcessing = false; _isAdding = false; _isEditing = false;
         }
 
         private void ClearFields()
         {
             if (SelectedTabIndex == 0)
-            { MaDonThuocMoi = ""; MaPhieuKhamMoi = ""; NgayKeMoi = DateTime.Now; MaNV_KeMoi = ""; SelectedBacSi = null; }
+            {
+                MaDonThuocMoi = "";
+                SelectedPhieuKhamCbo = null;
+                NgayKeMoi = DateTime.Now;
+                MaNV_KeMoi = "";
+                SelectedBacSi = null;
+            }
             else
-            { MaThuocMoi = ""; SelectedThuocHienTai = null; DVTMoi = ""; SoLuongMoi = 0; GiaBanMoi = 0; LieuDungMoi = ""; }
+            { MaThuocMoi = ""; SelectedThuocHienTai = null; DVTMoi = ""; SoLuongMoi = 0; GiaBanMoi = 0; ThanhTienMoi = 0; LieuDungMoi = ""; }
         }
 
-        // ✅ LoadData(): Thay LoadDummyData() bằng load từ Database thực
         private void LoadData()
         {
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject())) return;
@@ -491,51 +608,50 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             {
                 using (var db = new QL_PHONG_KHAM())
                 {
-                    // 1. Load thuốc → ThuocGocLocal
+                    var phieuKhams = db.PHIEUKHAMs.OrderByDescending(x => x.NGAYKHAM).ToList();
+                    DanhSachPhieuKhamCbo = new ObservableCollection<PHIEUKHAM>(phieuKhams);
+
                     DanhSachThuocGoc = db.THUOCs.ToList()
                         .Select(t => new ThuocGocLocal
                         {
-                            MaThuoc  = t.MA_THUOC?.Trim(),
+                            MaThuoc = t.MA_THUOC?.Trim(),
                             TenThuoc = t.TEN_THUOC,
-                            DVT      = "",          // Không có trong entity THUOC
-                            GiaBan   = t.GIA_BAN
+                            DVT = "",
+                            GiaBan = t.GIA_BAN
                         }).ToList();
 
-                    // 2. Load nhân viên → BacSiLocal
                     DanhSachBacSi = new ObservableCollection<BacSiLocal>(
                         db.NHANVIENs.ToList().Select(nv => new BacSiLocal
                         {
-                            MaNV  = nv.MaNV?.Trim(),
+                            MaNV = nv.MaNV?.Trim(),
                             HoTen = nv.HoTen
                         })
                     );
 
-                    // 3. Load đơn thuốc → DonThuocLocal (join NHANVIEN để lấy tên)
                     var donThuocs = db.DONTHUOCs
                         .OrderByDescending(x => x.MA_DONTHUOC)
                         .ToList()
                         .Select(dt => new DonThuocLocal
                         {
-                            MaDonThuoc  = dt.MA_DONTHUOC?.Trim(),
+                            MaDonThuoc = dt.MA_DONTHUOC?.Trim(),
                             MaPhieuKham = dt.MA_PHIEUKHAM?.Trim(),
-                            NgayKe      = DateTime.Today,
-                            MaNV_Ke     = dt.MANV_KE?.Trim(),
-                            TenBacSiKe  = dt.NHANVIEN?.HoTen ?? dt.MANV_KE
+                            NgayKe = DateTime.Today,
+                            MaNV_Ke = dt.MANV_KE?.Trim(),
+                            TenBacSiKe = dt.NHANVIEN?.HoTen ?? dt.MANV_KE
                         }).ToList();
                     DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>(donThuocs);
 
-                    // 4. Load chi tiết đơn thuốc → ChiTietDonThuocLocal (join THUOC để lấy tên)
                     var chiTiets = db.CHITIET_DONTHUOC
                         .ToList()
                         .Select(ct => new ChiTietDonThuocLocal
                         {
                             MaDonThuoc = ct.MA_DONTHUOC?.Trim(),
-                            MaThuoc    = ct.MA_THUOC?.Trim(),
-                            TenThuoc   = ct.THUOC?.TEN_THUOC,
-                            DVT        = "",
-                            SoLuong    = ct.SOLUONG ?? 1,
-                            GiaBan     = ct.GIA_LUC_BAN,
-                            LieuDung   = ""
+                            MaThuoc = ct.MA_THUOC?.Trim(),
+                            TenThuoc = ct.THUOC?.TEN_THUOC,
+                            DVT = "",
+                            SoLuong = ct.SOLUONG ?? 1,
+                            GiaBan = ct.GIA_LUC_BAN,
+                            LieuDung = ""
                         }).ToList();
                     _toanBoChiTietDon = new ObservableCollection<ChiTietDonThuocLocal>(chiTiets);
                 }
@@ -543,9 +659,10 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show("Không thể kết nối Database: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
-                DanhSachThuocGoc  = new List<ThuocGocLocal>();
-                DanhSachBacSi     = new ObservableCollection<BacSiLocal>();
-                DanhSachDonThuoc  = new ObservableCollection<DonThuocLocal>();
+                DanhSachPhieuKhamCbo = new ObservableCollection<PHIEUKHAM>();
+                DanhSachThuocGoc = new List<ThuocGocLocal>();
+                DanhSachBacSi = new ObservableCollection<BacSiLocal>();
+                DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>();
                 _toanBoChiTietDon = new ObservableCollection<ChiTietDonThuocLocal>();
             }
         }
