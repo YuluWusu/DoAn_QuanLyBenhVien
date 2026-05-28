@@ -180,8 +180,7 @@
                         </StackPanel>
                         <!-- ✅ Sửa: MaBenhNhan → MA_BENHNHAN -->
                         <TextBox Text="{Binding BNDangChon.MA_BENHNHAN, UpdateSourceTrigger=PropertyChanged}" 
-                                 IsEnabled="{Binding IsSua}" 
-                                 Style="{StaticResource DarkTextBox}" Margin="0,5,0,15"/>
+                                 IsReadOnly="True" Style="{StaticResource DarkTextBox}" Margin="0,5,0,15"/>
 
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Họ Và Tên Bệnh Nhân " Foreground="#94A3B8" FontSize="13"/>
@@ -191,15 +190,16 @@
                         <TextBox Text="{Binding BNDangChon.TEN_BENHNHAN, UpdateSourceTrigger=PropertyChanged}" 
                                  IsEnabled="{Binding IsSua}" 
                                  Style="{StaticResource DarkTextBox}" Margin="0,5,0,15"/>
+                    </StackPanel>
 
+                    <!-- Cột phải: chỉ hiển thị thông tin có trong entity -->
+                    <StackPanel Grid.Column="1" Margin="15,0,0,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Ngày Sinh (dd/MM/yyyy) " Foreground="#94A3B8" FontSize="13"/>
                             <TextBlock Text="*" Foreground="#EF4444" FontSize="13"/>
                         </StackPanel>
                         <!-- ✅ Sửa: Dùng DatePicker thay vì TextBox để binding DateTime? -->
-                        <DatePicker SelectedDate="{Binding BNDangChon.NGAYSINH, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                    IsEnabled="{Binding IsSua}" 
-                                    Margin="0,5,0,15" Height="30" />
+                        <DatePicker SelectedDate="{Binding BNDangChon.NGAYSINH, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsSua}" Margin="0,5,0,15" Height="30" Background="White"/>
 
                         <TextBlock Text="Giới Tính" Foreground="#94A3B8" FontSize="13" Margin="0,0,0,10" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,15" IsEnabled="{Binding IsSua}">
@@ -207,18 +207,6 @@
                             <RadioButton Content="Nữ" Style="{StaticResource DarkRadioButton}" IsChecked="{Binding IsNu}"/>
                             <RadioButton Content="Khác" Style="{StaticResource DarkRadioButton}" IsChecked="{Binding IsKhac}"/>
                         </StackPanel>
-                    </StackPanel>
-
-                    <!-- Cột phải: chỉ hiển thị thông tin có trong entity -->
-                    <StackPanel Grid.Column="1" Margin="15,0,0,0">
-                        <TextBlock Text="Ghi Chú (Không bắt buộc)" Foreground="#94A3B8" FontSize="13"/>
-                        <TextBox IsEnabled="{Binding IsSua}" 
-                                 Style="{StaticResource DarkTextBox}" Margin="0,5,0,15"
-                                 Height="120" TextWrapping="Wrap" AcceptsReturn="True"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Text=""/>
-                        <TextBlock Text="⚠ Lưu ý: Entity BENHNHAN chỉ có Mã, Tên, Ngày sinh, Giới tính." 
-                                   Foreground="#64748B" FontSize="11" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -244,9 +232,6 @@
 
                 <Button Content="Lưu Dữ Liệu" Command="{Binding LenhLuu}" IsEnabled="{Binding IsSua}" 
                         Width="130" Height="38" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
-                <Button Content="Thêm Phiếu Khám" 
-                        Command="{Binding LenhThemPK}" IsEnabled="{Binding CoChon}" 
-                        Width="160" Height="38" Style="{StaticResource WarningButtonStyle}"/>
             </StackPanel>
 
             <!-- ============ DANH SÁCH BỆNH NHÂN ============ -->
