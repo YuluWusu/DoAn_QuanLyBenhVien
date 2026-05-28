@@ -94,7 +94,7 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             LenhSua = new RelayCommand(p => { IsSua = true; TenNutThem = "Hủy Bỏ"; }, p => CoChon && !IsSua);
 
             LenhXoa = new RelayCommand(p => {
-                if (MessageBox.Show($"Bạn có chắc chắn muốn xóa hồ sơ: {BNDangChon.TEN_BENHNHAN}?", "Xác nhận", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                if (MessageBox.Show($"Bạn có chắc chắn muốn xóa hồ sơ: {BNDangChon.TEN_BENHNHAN}?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     try
                     {
