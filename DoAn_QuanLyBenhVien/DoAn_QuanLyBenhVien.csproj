@@ -36,6 +36,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="LiveCharts">
+      <HintPath>packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf">
+      <HintPath>packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus">
+      <HintPath>packages\EPPlus.8.6.0\lib\net462\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces">
+      <HintPath>packages\EPPlus.Interfaces.8.4.0\lib\net462\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream">
+      <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations">
+      <HintPath>packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -125,25 +143,26 @@
     <Compile Include="Models\THUOC.cs">
       <DependentUpon>DataPhongKham.tt</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\BaseViewModel.cs" />
-    <Compile Include="ViewModels\DanhSachBNViewModel.cs" />
-    <Compile Include="ViewModels\DanhSachThuocViewModel.cs" />
-    <Compile Include="ViewModels\DichVuViewModel.cs" />
-    <Compile Include="ViewModels\DonThuocViewModel.cs" />
-    <Compile Include="ViewModels\DSNhanVienViewModel.cs" />
-    <Compile Include="ViewModels\HoaDonViewModel.cs" />
-    <Compile Include="ViewModels\HoSoKhamViewModel.cs" />
-    <Compile Include="ViewModels\IdGenerator.cs" />
-    <Compile Include="ViewModels\KhungViewModel.cs" />
+    <Compile Include="Helper\BaseViewModel.cs" />
+    <Compile Include="ViewModels\VM_DanhSachBN.cs" />
+    <Compile Include="ViewModels\VM_DanhSachThuoc.cs" />
+    <Compile Include="ViewModels\VM_DichVu.cs" />
+    <Compile Include="ViewModels\VM_DonThuoc.cs" />
+    <Compile Include="ViewModels\VM_DSNhanVien.cs" />
+    <Compile Include="ViewModels\VM_HoaDon.cs" />
+    <Compile Include="ViewModels\VM_HoSoKham.cs" />
+    <Compile Include="ViewModels\VM_ThongKe.cs" />
+    <Compile Include="Helper\IdGenerator.cs" />
+    <Compile Include="ViewModels\VM_Khung.cs" />
     <Compile Include="ViewModels\LocalModels.cs" />
-    <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\PhieuXuatThuocViewModel.cs" />
-    <Compile Include="ViewModels\TrangChuViewModel.cs" />
-    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\VM_Login.cs" />
+    <Compile Include="ViewModels\VM_PhieuXuatThuoc.cs" />
+    <Compile Include="ViewModels\VM_TrangChu.cs" />
+    <Compile Include="Helper\RelayCommand.cs" />
     <Compile Include="Views\TrangChu.xaml.cs">
       <DependentUpon>TrangChu.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UC_DanhSachBacSi.xaml.cs">
+    <Compile Include="Views\UC_NhanVien.xaml.cs">
       <DependentUpon>UC_NhanVien.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UC_DichVu.xaml.cs">
@@ -157,6 +176,9 @@
     </Compile>
     <Compile Include="Views\UC_PhieuXuatThuoc.xaml.cs">
       <DependentUpon>UC_PhieuXuatThuoc.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UC_ThongKe.xaml.cs">
+      <DependentUpon>UC_ThongKe.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UC_Thuoc.xaml.cs">
       <DependentUpon>UC_Thuoc.xaml</DependentUpon>
@@ -202,6 +224,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\UC_PhieuXuatThuoc.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UC_ThongKe.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -251,6 +277,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="test.bin" />
+    <None Include="test2.bin" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -258,6 +286,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Resource Include="build_log.txt" />
+    <Resource Include="Logo HUIT-01.ico" />
     <Content Include="Models\DataPhongKham.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DataPhongKham.edmx</DependentUpon>
@@ -268,6 +298,10 @@
       <DependentUpon>DataPhongKham.edmx</DependentUpon>
       <LastGenOutput>DataPhongKham.cs</LastGenOutput>
     </Content>
+    <Content Include="nuget.exe" />
+    <Content Include="QL_PHONG_KHAM.sql" />
+    <Resource Include="test.txt" />
+    <Resource Include="test_recovery.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

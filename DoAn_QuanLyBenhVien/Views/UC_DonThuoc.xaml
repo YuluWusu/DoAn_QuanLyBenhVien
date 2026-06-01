@@ -10,7 +10,7 @@
              Background="#0F1923">
 
     <UserControl.DataContext>
-        <vm:DonThuocViewModel/>
+        <vm:VM_DonThuoc/>
     </UserControl.DataContext>
 
     <UserControl.Resources>
@@ -192,15 +192,25 @@
                         </Grid>
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
-                        <Button Content="{Binding AddButtonContent}" Command="{Binding AddCommand}" Width="110" Height="35" Margin="0,0,10,0" Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource ActionButtonStyle}"/>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Button Content="{Binding AddButtonContent}" Command="{Binding AddCommand}" Width="110" Height="35" Margin="0,0,10,0" Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
+                            <Button Content="📝 Sửa" Command="{Binding UpdateCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource ActionButtonStyle}"/>
+                            <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource DangerButtonStyle}"/>
+                            <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="130" Height="35" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
+                        </StackPanel>
 
-                        <Button Content="🗑 Xóa" Command="{Binding DeleteCommand}" IsEnabled="{Binding EditDeleteVisibility}" Width="110" Height="35" Margin="0,0,10,0" Style="{StaticResource DangerButtonStyle}"/>
-
-                        <Button Content="💾 Lưu" Command="{Binding SaveCommand}" IsEnabled="{Binding SaveButtonVisibility}" Width="130" Height="35" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
-                    </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="🔍 Tìm kiếm:" Foreground="#94A3B8" FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Width="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkTextBox}"/>
+                        </StackPanel>
+                    </Grid>
 
                     <DataGrid Grid.Row="2" ItemsSource="{Binding DanhSachDonThuoc}" SelectedItem="{Binding SelectedDonThuoc}" AutoGenerateColumns="False" IsReadOnly="True">
                         <DataGrid.Columns>
@@ -274,3 +284,4 @@
         </TabControl>
     </Grid>
 </UserControl>
+

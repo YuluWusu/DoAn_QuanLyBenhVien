@@ -1,0 +1,720 @@
+using DoAn_QuanLyBenhVien.Models;
+using System;
+using DoAn_QuanLyBenhVien.Helper;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.Entity;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
+
+namespace DoAn_QuanLyBenhVien.ViewModels
+{
+    public class VM_DonThuoc : BaseViewModel
+    {
+        // -------------------------------------------------------------------
+        // Dữ liệu - dùng DonThuocLocal và ChiTietDonThuocLocal (UI helper)
+        // Lưu ý: Các class LocalModels này đã tồn tại trong file LocalModels.cs 
+        // nên không cần khai báo lại ở đây để tránh lỗi trùng lặp (CS0101).
+        // -------------------------------------------------------------------
+        private ObservableCollection<DonThuocLocal> _danhSachDonThuoc;
+        public ObservableCollection<DonThuocLocal> DanhSachDonThuoc
+        {
+            get => _danhSachDonThuoc;
+            set { _danhSachDonThuoc = value; OnPropertyChanged(); }
+        }
+
+        private List<DonThuocLocal> _originalDonThuoc = new List<DonThuocLocal>();
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set { _searchText = value; OnPropertyChanged(); ExecuteSearch(); }
+        }
+        private ObservableCollection<ChiTietDonThuocLocal> _toanBoChiTietDon;
+
+        private ObservableCollection<ChiTietDonThuocLocal> _danhSachChiTietDon_HienThi;
+        public ObservableCollection<ChiTietDonThuocLocal> DanhSachChiTietDon_HienThi
+        {
+            get => _danhSachChiTietDon_HienThi;
+            set { _danhSachChiTietDon_HienThi = value; OnPropertyChanged(); }
+        }
+
+        // Danh sách tra cứu thuốc & bác sĩ (load từ DB)
+        private List<ThuocGocLocal> _danhSachThuocGoc;
+        public List<ThuocGocLocal> DanhSachThuocGoc
+        {
+            get => _danhSachThuocGoc;
+            set { _danhSachThuocGoc = value; OnPropertyChanged(); }
+        }
+
+        private ObservableCollection<BacSiLocal> _danhSachBacSi;
+        public ObservableCollection<BacSiLocal> DanhSachBacSi
+        {
+            get => _danhSachBacSi;
+            set { _danhSachBacSi = value; OnPropertyChanged(); }
+        }
+
+        // Nguồn dữ liệu Phiếu Khám cho ComboBox trên giao diện đơn thuốc
+        private ObservableCollection<PHIEUKHAM> _danhSachPhieuKhamCbo;
+        public ObservableCollection<PHIEUKHAM> DanhSachPhieuKhamCbo
+        {
+            get => _danhSachPhieuKhamCbo;
+            set { _danhSachPhieuKhamCbo = value; OnPropertyChanged(); }
+        }
+
+        // Đối tượng Phiếu Khám được chọn từ ComboBox
+        private PHIEUKHAM _selectedPhieuKhamCbo;
+        public PHIEUKHAM SelectedPhieuKhamCbo
+        {
+            get => _selectedPhieuKhamCbo;
+            set
+            {
+                _selectedPhieuKhamCbo = value;
+                OnPropertyChanged();
+                if (_selectedPhieuKhamCbo != null)
+                {
+                    _maPhieuKhamMoi = _selectedPhieuKhamCbo.MA_PHIEUKHAM;
+                    OnPropertyChanged(nameof(MaPhieuKhamMoi));
+                }
+                else
+                {
+                    _maPhieuKhamMoi = "";
+                    OnPropertyChanged(nameof(MaPhieuKhamMoi));
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // Trạng thái Tab
+        // -------------------------------------------------------------------
+        private int _selectedTabIndex;
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set
+            {
+                _selectedTabIndex = value;
+                OnPropertyChanged();
+                if (_selectedTabIndex == 1) ChiTietDonThuoc();
+                if (!_isAdding && !_isEditing) ResetUIState();
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // UI State
+        // -------------------------------------------------------------------
+        private string _addButtonContent = "➕ Thêm";
+        public string AddButtonContent { get => _addButtonContent; set { _addButtonContent = value; OnPropertyChanged(); } }
+
+        private bool _saveButtonVisibility = false;
+        public bool SaveButtonVisibility { get => _saveButtonVisibility; set { _saveButtonVisibility = value; OnPropertyChanged(); } }
+
+        private bool _editDeleteVisibility = false;
+        public bool EditDeleteVisibility { get => _editDeleteVisibility; set { _editDeleteVisibility = value; OnPropertyChanged(); } }
+
+        private bool _isAdding = false;
+        private bool _isEditing = false;
+
+        private bool _isProcessing = false;
+        public bool IsProcessing { get => _isProcessing; set { _isProcessing = value; OnPropertyChanged(); } }
+
+        // -------------------------------------------------------------------
+        // Input fields - Tab 0 (Đơn thuốc)
+        // -------------------------------------------------------------------
+        private string _maDonThuocMoi;
+        public string MaDonThuocMoi { get => _maDonThuocMoi; set { _maDonThuocMoi = value; OnPropertyChanged(); } }
+
+        private string _maPhieuKhamMoi;
+        public string MaPhieuKhamMoi
+        {
+            get => _maPhieuKhamMoi;
+            set
+            {
+                _maPhieuKhamMoi = value;
+                OnPropertyChanged();
+                // Đồng bộ ngược lại ComboBox nếu mã này thay đổi từ code (khi chọn dòng trên Grid)
+                if (DanhSachPhieuKhamCbo != null && !string.IsNullOrEmpty(_maPhieuKhamMoi))
+                {
+                    var pk = DanhSachPhieuKhamCbo.FirstOrDefault(x => x.MA_PHIEUKHAM?.Trim() == _maPhieuKhamMoi.Trim());
+                    if (SelectedPhieuKhamCbo != pk) 
+                    {
+                        _selectedPhieuKhamCbo = pk; 
+                        OnPropertyChanged(nameof(SelectedPhieuKhamCbo));
+                    }
+                }
+            }
+        }
+
+        private DateTime _ngayKeMoi = DateTime.Now;
+        public DateTime NgayKeMoi { get => _ngayKeMoi; set { _ngayKeMoi = value; OnPropertyChanged(); } }
+
+        private string _maNV_KeMoi;
+        public string MaNV_KeMoi
+        {
+            get => _maNV_KeMoi;
+            set
+            {
+                if (_maNV_KeMoi == value) return;
+                _maNV_KeMoi = value;
+                OnPropertyChanged();
+                if (!string.IsNullOrWhiteSpace(_maNV_KeMoi))
+                {
+                    var bs = DanhSachBacSi?.FirstOrDefault(x => x.MaNV?.Trim().ToUpper() == _maNV_KeMoi.Trim().ToUpper());
+                    if (SelectedBacSi != bs) SelectedBacSi = bs;
+                }
+                else SelectedBacSi = null;
+            }
+        }
+
+        private DonThuocLocal _selectedDonThuoc;
+        public DonThuocLocal SelectedDonThuoc
+        {
+            get => _selectedDonThuoc;
+            set
+            {
+                _selectedDonThuoc = value;
+                OnPropertyChanged();
+                if (_selectedDonThuoc != null)
+                {
+                    MaDonThuocMoi = _selectedDonThuoc.MaDonThuoc;
+                    MaPhieuKhamMoi = _selectedDonThuoc.MaPhieuKham; // Kích hoạt đồng bộ ComboBox
+                    NgayKeMoi = _selectedDonThuoc.NgayKe;
+                    MaNV_KeMoi = _selectedDonThuoc.MaNV_Ke;
+                    SelectedBacSi = DanhSachBacSi?.FirstOrDefault(x => x.MaNV?.Trim().ToUpper() == _selectedDonThuoc.MaNV_Ke?.Trim().ToUpper());
+                    ChiTietDonThuoc();
+                    EditDeleteVisibility = true;
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // Input fields - Tab 1 (Chi tiết đơn thuốc)
+        // -------------------------------------------------------------------
+        private string _maThuocMoi;
+        public string MaThuocMoi
+        {
+            get => _maThuocMoi;
+            set { _maThuocMoi = value; OnPropertyChanged(); AutoFillThuocInfo(); }
+        }
+
+        private string _dvtMoi;
+        public string DVTMoi { get => _dvtMoi; set { _dvtMoi = value; OnPropertyChanged(); } }
+
+        private int _soLuongMoi;
+        public int SoLuongMoi
+        {
+            get => _soLuongMoi;
+            set
+            {
+                _soLuongMoi = value;
+                OnPropertyChanged();
+                ThanhTienMoi = _soLuongMoi * _giaBanMoi;
+            }
+        }
+
+        private decimal _giaBanMoi;
+        public decimal GiaBanMoi
+        {
+            get => _giaBanMoi;
+            set
+            {
+                _giaBanMoi = value;
+                OnPropertyChanged();
+                ThanhTienMoi = _soLuongMoi * _giaBanMoi;
+            }
+        }
+
+        private decimal _thanhTienMoi;
+        public decimal ThanhTienMoi
+        {
+            get => _thanhTienMoi;
+            set { _thanhTienMoi = value; OnPropertyChanged(); }
+        }
+
+        private string _lieuDungMoi;
+        public string LieuDungMoi { get => _lieuDungMoi; set { _lieuDungMoi = value; OnPropertyChanged(); } }
+
+        private BacSiLocal _selectedBacSi;
+        public BacSiLocal SelectedBacSi
+        {
+            get => _selectedBacSi;
+            set
+            {
+                if (_selectedBacSi == value) return;
+                _selectedBacSi = value;
+                OnPropertyChanged();
+                if (_selectedBacSi != null && MaNV_KeMoi != _selectedBacSi.MaNV)
+                    MaNV_KeMoi = _selectedBacSi.MaNV;
+            }
+        }
+
+        private ChiTietDonThuocLocal _selectedChiTiet;
+        public ChiTietDonThuocLocal SelectedChiTiet
+        {
+            get => _selectedChiTiet;
+            set
+            {
+                _selectedChiTiet = value;
+                OnPropertyChanged();
+                if (_selectedChiTiet != null)
+                {
+                    MaThuocMoi = _selectedChiTiet.MaThuoc;
+                    SelectedThuocHienTai = DanhSachThuocGoc?.FirstOrDefault(x => x.MaThuoc == _selectedChiTiet.MaThuoc);
+                    DVTMoi = _selectedChiTiet.DVT;
+                    SoLuongMoi = _selectedChiTiet.SoLuong;
+                    GiaBanMoi = _selectedChiTiet.GiaBan;
+                    LieuDungMoi = _selectedChiTiet.LieuDung;
+
+                    ThanhTienMoi = _selectedChiTiet.SoLuong * _selectedChiTiet.GiaBan;
+
+                    EditDeleteVisibility = true;
+                    SaveButtonVisibility = false;
+                    IsAddingEditingState(false);
+                }
+            }
+        }
+
+        private ThuocGocLocal _selectedThuocHienTai;
+        public ThuocGocLocal SelectedThuocHienTai
+        {
+            get => _selectedThuocHienTai;
+            set
+            {
+                _selectedThuocHienTai = value;
+                OnPropertyChanged();
+                if (_selectedThuocHienTai != null)
+                {
+                    MaThuocMoi = _selectedThuocHienTai.MaThuoc;
+                    DVTMoi = _selectedThuocHienTai.DVT;
+                    GiaBanMoi = _selectedThuocHienTai.GiaBan;
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // Commands
+        // -------------------------------------------------------------------
+        public ICommand AddCommand { get; }
+        public ICommand UpdateCommand { get; }
+        public ICommand DeleteCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand ChiTietCommand { get; }
+        public ICommand SearchCommand { get; }
+
+        public VM_DonThuoc()
+        {
+            AddCommand = new RelayCommand(ExecuteAdd);
+            UpdateCommand = new RelayCommand(ExecuteUpdate, CanExecuteUpdateDelete);
+            DeleteCommand = new RelayCommand(ExecuteDelete, CanExecuteUpdateDelete);
+            SaveCommand = new RelayCommand(ExecuteSave, CanExecuteSave);
+            ChiTietCommand = new RelayCommand(ExecuteChiTiet, CanExecuteChiTiet);
+            SearchCommand = new RelayCommand(p => ExecuteSearch());
+
+            LoadData();
+            SelectedDonThuoc = null;
+            SelectedChiTiet = null;
+            ClearFields();
+            ResetUIState();
+        }
+
+        // -------------------------------------------------------------------
+        // Command Handlers
+        // -------------------------------------------------------------------
+        private void ExecuteAdd(object obj)
+        {
+            if (!_isAdding && !_isEditing)
+            {
+                IsAddingEditingState(true);
+                SaveButtonVisibility = true; EditDeleteVisibility = false;
+                AddButtonContent = "❌ Hủy"; ClearFields();
+                if (SelectedTabIndex == 0)
+                {
+                    MaDonThuocMoi = SinhMaDonThuocTuDong();
+                    MaNV_KeMoi = VM_Login.MaNVHienTai ?? "NV01";
+                    NgayKeMoi = DateTime.Now;
+                }
+            }
+            else { IsAddingEditingState(false); ResetUIState(); ClearFields(); }
+        }
+
+        private string SinhMaDonThuocTuDong()
+        {
+            try
+            {
+                using (var db = new QL_PHONG_KHAM())
+                {
+                    var danhSachMa = db.DONTHUOCs.Select(x => x.MA_DONTHUOC).ToList();
+                    int maxNumber = 0;
+
+                    foreach (var ma in danhSachMa)
+                    {
+                        if (string.IsNullOrWhiteSpace(ma) || ma.Length < 3) continue;
+                        string soDuoi = ma.Substring(2).Trim();
+                        if (int.TryParse(soDuoi, out int currentNumber))
+                        {
+                            if (currentNumber > maxNumber) maxNumber = currentNumber;
+                        }
+                    }
+
+                    int extension = maxNumber + 1;
+                    return "DT" + extension.ToString("D4");
+                }
+            }
+            catch
+            {
+                return "DT" + new Random().Next(1000, 9999).ToString();
+            }
+        }
+
+        private void ExecuteUpdate(object obj)
+        {
+            _isEditing = true; IsProcessing = true;
+            SaveButtonVisibility = true; EditDeleteVisibility = false;
+            AddButtonContent = "❌ Hủy";
+        }
+
+        private void ExecuteDelete(object obj)
+        {
+            if (SelectedTabIndex == 0 && SelectedDonThuoc != null)
+            {
+                if (MessageBox.Show("Bạn có chắc muốn xóa đơn thuốc này?", "Xác nhận",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        using (var db = new QL_PHONG_KHAM())
+                        {
+                            var chitiets = db.CHITIET_DONTHUOC.Where(x => x.MA_DONTHUOC == SelectedDonThuoc.MaDonThuoc).ToList();
+                            db.CHITIET_DONTHUOC.RemoveRange(chitiets);
+                            var dt = db.DONTHUOCs.Find(SelectedDonThuoc.MaDonThuoc);
+                            if (dt != null) db.DONTHUOCs.Remove(dt);
+                            db.SaveChanges();
+                        }
+                        DanhSachDonThuoc.Remove(SelectedDonThuoc);
+                        _originalDonThuoc.Remove(SelectedDonThuoc);
+                        ExecuteSearch();
+                        ClearFields(); ResetUIState();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi khi xóa: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else if (SelectedTabIndex == 1 && SelectedChiTiet != null)
+            {
+                try
+                {
+                    using (var db = new QL_PHONG_KHAM())
+                    {
+                        var ct = db.CHITIET_DONTHUOC.FirstOrDefault(x =>
+                            x.MA_DONTHUOC == SelectedChiTiet.MaDonThuoc &&
+                            x.MA_THUOC == SelectedChiTiet.MaThuoc);
+                        if (ct != null) { db.CHITIET_DONTHUOC.Remove(ct); db.SaveChanges(); }
+                    }
+                    _toanBoChiTietDon.Remove(SelectedChiTiet);
+                    ChiTietDonThuoc();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xóa: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                ClearFields(); ResetUIState();
+            }
+        }
+
+        private bool CanExecuteSave(object obj)
+        {
+            if (!_isAdding && !_isEditing) return false;
+            if (SelectedTabIndex == 0)
+                return !string.IsNullOrWhiteSpace(MaDonThuocMoi) && SelectedPhieuKhamCbo != null;
+            else
+                return !string.IsNullOrWhiteSpace(MaThuocMoi) && SoLuongMoi > 0;
+        }
+
+        private bool CanExecuteUpdateDelete(object obj)
+        {
+            if (IsProcessing) return false;
+            return SelectedTabIndex == 0 ? SelectedDonThuoc != null : SelectedChiTiet != null;
+        }
+
+        private bool CanExecuteChiTiet(object obj) => SelectedDonThuoc != null && !IsProcessing;
+
+        private void ExecuteSave(object obj)
+        {
+            try
+            {
+                using (var db = new QL_PHONG_KHAM())
+                {
+                    if (SelectedTabIndex == 0)
+                    {
+                        string tenHienThi = VM_Login.HoTenHienTai ?? MaNV_KeMoi;
+
+                        if (_isAdding)
+                        {
+                            if (!db.PHIEUKHAMs.Any(x => x.MA_PHIEUKHAM == MaPhieuKhamMoi))
+                            {
+                                MessageBox.Show("Mã phiếu khám không tồn tại trong hệ thống!", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+
+                            var newDT = new DONTHUOC
+                            {
+                                MA_DONTHUOC = MaDonThuocMoi,
+                                MA_PHIEUKHAM = MaPhieuKhamMoi,
+                                MANV_KE = MaNV_KeMoi,
+                                TRANGTHAI = "Chờ xuất"
+                            };
+                            db.DONTHUOCs.Add(newDT);
+                            db.SaveChanges();
+
+                            var newLocal = new DonThuocLocal
+                            {
+                                MaDonThuoc = MaDonThuocMoi,
+                                MaPhieuKham = MaPhieuKhamMoi,
+                                NgayKe = NgayKeMoi,
+                                MaNV_Ke = MaNV_KeMoi,
+                                TenBacSiKe = tenHienThi
+                            };
+                            _originalDonThuoc.Add(newLocal);
+                            DanhSachDonThuoc.Add(newLocal);
+                            ExecuteSearch();
+                        }
+                        else if (_isEditing && SelectedDonThuoc != null)
+                        {
+                            var dt = db.DONTHUOCs.Find(SelectedDonThuoc.MaDonThuoc);
+                            if (dt != null)
+                            {
+                                dt.MA_PHIEUKHAM = MaPhieuKhamMoi;
+                                db.Entry(dt).State = EntityState.Modified;
+                                db.SaveChanges();
+
+                                var idx = DanhSachDonThuoc.IndexOf(SelectedDonThuoc);
+                                if (idx >= 0)
+                                {
+                                    var updated = new DonThuocLocal
+                                    {
+                                        MaDonThuoc = MaDonThuocMoi,
+                                        MaPhieuKham = MaPhieuKhamMoi,
+                                        NgayKe = SelectedDonThuoc.NgayKe,
+                                        MaNV_Ke = SelectedDonThuoc.MaNV_Ke,
+                                        TenBacSiKe = SelectedDonThuoc.TenBacSiKe
+                                    };
+                                    DanhSachDonThuoc[idx] = updated;
+                                    
+                                    var origIdx = _originalDonThuoc.IndexOf(SelectedDonThuoc);
+                                    if(origIdx >= 0) _originalDonThuoc[origIdx] = updated;
+
+                                    SelectedDonThuoc = updated;
+                                    ExecuteSearch();
+                                }
+                            }
+                        }
+                    }
+                    else if (SelectedTabIndex == 1)
+                    {
+                        var thuocInfo = DanhSachThuocGoc?.FirstOrDefault(x => x.MaThuoc == MaThuocMoi);
+
+                        if (_isAdding && SelectedDonThuoc != null)
+                        {
+                            if (db.CHITIET_DONTHUOC.Any(x => x.MA_DONTHUOC == SelectedDonThuoc.MaDonThuoc && x.MA_THUOC == MaThuocMoi))
+                            {
+                                MessageBox.Show("Thuốc này đã có trong đơn, vui lòng chọn dòng đó và bấm Sửa để cập nhật số lượng!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                return;
+                            }
+
+                            db.CHITIET_DONTHUOC.Add(new CHITIET_DONTHUOC
+                            {
+                                MA_DONTHUOC = SelectedDonThuoc.MaDonThuoc,
+                                MA_THUOC = MaThuocMoi,
+                                SOLUONG = SoLuongMoi,
+                                GIA_LUC_BAN = GiaBanMoi
+                            });
+                            db.SaveChanges();
+
+                            _toanBoChiTietDon.Add(new ChiTietDonThuocLocal
+                            {
+                                MaDonThuoc = SelectedDonThuoc.MaDonThuoc,
+                                MaThuoc = MaThuocMoi,
+                                TenThuoc = thuocInfo?.TenThuoc,
+                                DVT = DVTMoi,
+                                SoLuong = SoLuongMoi,
+                                GiaBan = GiaBanMoi,
+                                LieuDung = LieuDungMoi
+                            });
+                        }
+                        else if (_isEditing && SelectedChiTiet != null)
+                        {
+                            var ct = db.CHITIET_DONTHUOC.Find(SelectedChiTiet.MaDonThuoc, SelectedChiTiet.MaThuoc);
+                            if (ct != null)
+                            {
+                                ct.SOLUONG = SoLuongMoi;
+                                ct.GIA_LUC_BAN = GiaBanMoi;
+                                db.Entry(ct).State = EntityState.Modified;
+                                db.SaveChanges();
+                            }
+                            SelectedChiTiet.MaThuoc = MaThuocMoi;
+                            SelectedChiTiet.TenThuoc = thuocInfo?.TenThuoc;
+                            SelectedChiTiet.DVT = DVTMoi;
+                            SelectedChiTiet.SoLuong = SoLuongMoi;
+                            SelectedChiTiet.GiaBan = GiaBanMoi;
+                            SelectedChiTiet.LieuDung = LieuDungMoi;
+
+                            var idx = _toanBoChiTietDon.IndexOf(SelectedChiTiet);
+                            if (idx >= 0) _toanBoChiTietDon[idx] = SelectedChiTiet;
+                        }
+                        ChiTietDonThuoc();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi lưu: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            MessageBox.Show("Lưu thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+            IsAddingEditingState(false); ResetUIState(); ClearFields();
+        }
+
+        private void ExecuteChiTiet(object obj)
+        {
+            if (SelectedDonThuoc != null)
+            { SelectedTabIndex = 1; ChiTietDonThuoc(); OnPropertyChanged(nameof(SelectedTabIndex)); }
+            else
+                MessageBox.Show("Vui lòng chọn một đơn thuốc trước!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void ChiTietDonThuoc()
+        {
+            if (SelectedDonThuoc != null && _toanBoChiTietDon != null)
+            {
+                var filtered = _toanBoChiTietDon.Where(x => x.MaDonThuoc == SelectedDonThuoc.MaDonThuoc).ToList();
+                DanhSachChiTietDon_HienThi = new ObservableCollection<ChiTietDonThuocLocal>(filtered);
+            }
+            else
+                DanhSachChiTietDon_HienThi = new ObservableCollection<ChiTietDonThuocLocal>();
+        }
+
+        private void AutoFillThuocInfo()
+        {
+            var thuoc = DanhSachThuocGoc?.FirstOrDefault(x => x.MaThuoc == MaThuocMoi);
+            if (thuoc != null) { DVTMoi = thuoc.DVT; GiaBanMoi = thuoc.GiaBan; }
+        }
+
+        private void IsAddingEditingState(bool state)
+        {
+            _isAdding = state; _isEditing = false;
+            IsProcessing = state;
+            AddButtonContent = state ? "❌ Hủy" : "➕ Thêm";
+        }
+
+        private void ResetUIState()
+        {
+            AddButtonContent = "➕ Thêm"; SaveButtonVisibility = false;
+            EditDeleteVisibility = (SelectedDonThuoc != null || SelectedChiTiet != null);
+            IsProcessing = false; _isAdding = false; _isEditing = false;
+        }
+
+        private void ClearFields()
+        {
+            if (SelectedTabIndex == 0)
+            {
+                MaDonThuocMoi = "";
+                SelectedPhieuKhamCbo = null;
+                NgayKeMoi = DateTime.Now;
+                MaNV_KeMoi = "";
+                SelectedBacSi = null;
+            }
+            else
+            { MaThuocMoi = ""; SelectedThuocHienTai = null; DVTMoi = ""; SoLuongMoi = 0; GiaBanMoi = 0; ThanhTienMoi = 0; LieuDungMoi = ""; }
+        }
+
+        private void LoadData()
+        {
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject())) return;
+            try
+            {
+                using (var db = new QL_PHONG_KHAM())
+                {
+                    var phieuKhams = db.PHIEUKHAMs.OrderByDescending(x => x.NGAYKHAM).ToList();
+                    DanhSachPhieuKhamCbo = new ObservableCollection<PHIEUKHAM>(phieuKhams);
+
+                    DanhSachThuocGoc = db.THUOCs.ToList()
+                        .Select(t => new ThuocGocLocal
+                        {
+                            MaThuoc = t.MA_THUOC?.Trim(),
+                            TenThuoc = t.TEN_THUOC,
+                            DVT = "",
+                            GiaBan = t.GIA_BAN
+                        }).ToList();
+
+                    DanhSachBacSi = new ObservableCollection<BacSiLocal>(
+                        db.NHANVIENs.ToList().Select(nv => new BacSiLocal
+                        {
+                            MaNV = nv.MaNV?.Trim(),
+                            HoTen = nv.HoTen
+                        })
+                    );
+
+                    var donThuocs = db.DONTHUOCs
+                        .OrderByDescending(x => x.MA_DONTHUOC)
+                        .ToList()
+                        .Select(dt => new DonThuocLocal
+                        {
+                            MaDonThuoc = dt.MA_DONTHUOC?.Trim(),
+                            MaPhieuKham = dt.MA_PHIEUKHAM?.Trim(),
+                            NgayKe = DateTime.Today,
+                            MaNV_Ke = dt.MANV_KE?.Trim(),
+                            TenBacSiKe = dt.NHANVIEN?.HoTen ?? dt.MANV_KE
+                        }).ToList();
+                    _originalDonThuoc = new List<DonThuocLocal>(donThuocs);
+                    DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>(donThuocs);
+
+                    var chiTiets = db.CHITIET_DONTHUOC
+                        .ToList()
+                        .Select(ct => new ChiTietDonThuocLocal
+                        {
+                            MaDonThuoc = ct.MA_DONTHUOC?.Trim(),
+                            MaThuoc = ct.MA_THUOC?.Trim(),
+                            TenThuoc = ct.THUOC?.TEN_THUOC,
+                            DVT = "",
+                            SoLuong = ct.SOLUONG ?? 1,
+                            GiaBan = ct.GIA_LUC_BAN,
+                            LieuDung = ""
+                        }).ToList();
+                    _toanBoChiTietDon = new ObservableCollection<ChiTietDonThuocLocal>(chiTiets);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể kết nối Database: " + ex.Message, "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                DanhSachPhieuKhamCbo = new ObservableCollection<PHIEUKHAM>();
+                DanhSachThuocGoc = new List<ThuocGocLocal>();
+                DanhSachBacSi = new ObservableCollection<BacSiLocal>();
+                DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>();
+                _toanBoChiTietDon = new ObservableCollection<ChiTietDonThuocLocal>();
+            }
+        }
+
+        private void ExecuteSearch()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>(_originalDonThuoc);
+            }
+            else
+            {
+                var kw = SearchText.ToLower();
+                var filtered = _originalDonThuoc.Where(x => 
+                    (x.MaDonThuoc != null && x.MaDonThuoc.ToLower().Contains(kw)) ||
+                    (x.MaPhieuKham != null && x.MaPhieuKham.ToLower().Contains(kw)) ||
+                    (x.TenBacSiKe != null && x.TenBacSiKe.ToLower().Contains(kw))
+                ).ToList();
+                DanhSachDonThuoc = new ObservableCollection<DonThuocLocal>(filtered);
+            }
+        }
+    }
+}

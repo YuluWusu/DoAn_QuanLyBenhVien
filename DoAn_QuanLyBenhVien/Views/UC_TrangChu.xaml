@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.DataContext>
-        <vm:TrangChuViewModel/>
+        <vm:VM_TrangChu/>
     </UserControl.DataContext>
 
     <Grid Background="#0F172A">
@@ -71,3 +71,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

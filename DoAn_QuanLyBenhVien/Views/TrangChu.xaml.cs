@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +22,31 @@ namespace DoAn_QuanLyBenhVien.Views
         public TrangChu()
         {
             InitializeComponent();
+        }
+
+        private bool isLoggingOut = false;
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (!isLoggingOut)
+            {
+                if (MessageBox.Show("Bạn có thực sự muốn thoát ứng dụng?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+            base.OnClosing(e);
+        }
+
+        private void MenuDangXuat_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Bạn có muốn đăng xuất không?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                isLoggingOut = true;
+                DangNhap dangNhap = new DangNhap();
+                dangNhap.Show();
+                this.Close();
+            }
         }
     }
 }

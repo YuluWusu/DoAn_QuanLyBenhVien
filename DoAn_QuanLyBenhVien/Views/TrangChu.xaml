@@ -2,13 +2,14 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DoAn_QuanLyBenhVien.ViewModels"
-        Title="Quản Lý Phòng Khám"
-        Height="720" Width="1280"
+        Title="Quản Lý Phòng Khám" Icon="/Logo HUIT-01.ico"
+        Height="1080" Width="1920"
         MinHeight="600" MinWidth="900"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
         Background="#0F1923">
     <Window.DataContext>
-        <vm:KhungViewModel/>
+        <vm:VM_Khung/>
     </Window.DataContext>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -353,17 +354,25 @@
                     <MenuItem Header="Hệ thống">
                         <MenuItem Header="👤  Thông tin tài khoản" Style="{StaticResource SubMenuItemStyle}"/>
                         <Separator/>
-                        <MenuItem Header="🚪  Đăng xuất" x:Name="MenuDangXuat" Style="{StaticResource SubMenuItemStyle}"/>
+                        <MenuItem Header="🚪  Đăng xuất" x:Name="MenuDangXuat" Click="MenuDangXuat_Click" Style="{StaticResource SubMenuItemStyle}"/>
                     </MenuItem>
 
                     <MenuItem Header="Danh mục">
+                        <MenuItem Header="👤  Bệnh nhân" Command="{Binding NavBenhNhan}" Style="{StaticResource SubMenuItemStyle}"/>
                         <MenuItem Header="👨‍⚕️  Bác sĩ" x:Name="MenuBacSi" Command="{Binding NavBacSi}" Style="{StaticResource SubMenuItemStyle}"/>
                         <MenuItem Header="💊  Thuốc" Command="{Binding NavThuoc}" x:Name="MenuThuoc" Style="{StaticResource SubMenuItemStyle}"/>
                         <MenuItem Header="🏷️  Dịch vụ" Command="{Binding NavDichVu}" Style="{StaticResource SubMenuItemStyle}"/>
                     </MenuItem>
 
+                    <MenuItem Header="Nghiệp vụ">
+                        <MenuItem Header="📝  Phiếu khám" Command="{Binding NavHoSo}" Style="{StaticResource SubMenuItemStyle}"/>
+                        <MenuItem Header="📦  Đơn Thuốc" Command="{Binding NavDonThuoc}" Style="{StaticResource SubMenuItemStyle}"/>
+                        <MenuItem Header="📦  Xuất Thuốc" Command="{Binding NavPhieuXuatThuoc}" Style="{StaticResource SubMenuItemStyle}"/>
+                        <MenuItem Header="💵  Hóa đơn" Command="{Binding NavHoaDon}" Style="{StaticResource SubMenuItemStyle}"/>
+                    </MenuItem>
+
                     <MenuItem Header="Báo cáo">
-                        <MenuItem Header="📊  Thống kê bệnh nhân" Command="{Binding NavBenhNhan}" Style="{StaticResource SubMenuItemStyle}"/>
+                        <MenuItem Header="📈  Thống kê doanh thu" Command="{Binding NavThongKe}" Style="{StaticResource SubMenuItemStyle}"/>
                     </MenuItem>
 
                     <MenuItem Header="Trợ giúp">
@@ -409,8 +418,8 @@
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock x:Name="TxtUserName"
-                                       Text="Bác sĩ Minh"
+                                <TextBlock x:Name="TxtUserName"
+                                       Text="{Binding UserName}"
                                        Foreground="#E2EAF3"
                                        FontFamily="Segoe UI"
                                        FontSize="12" FontWeight="Medium"
@@ -509,6 +518,50 @@
                         HorizontalContentAlignment="Left"
                         Padding="12,10"
                         />
+                        
+                        <TextBlock Text="BÁO CÁO"
+                       Foreground="#6B8299"
+                       FontFamily="Segoe UI"
+                       FontSize="10" FontWeight="Bold"
+                       Margin="10,16,0,10"/>
+
+                        <Button Content="📊  Thống kê tổng hợp" Command="{Binding NavThongKe}"
+                        Style="{StaticResource BtnGhost}" 
+                        Margin="0,0,0,4"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,10"
+                        />
+                        
+                        <Border Height="1" Background="#1E3048" Margin="0,15,0,15"/>
+                        
+                        <Button Content="🚪  Đăng xuất" Click="MenuDangXuat_Click"
+                        Background="#7F1D1D" Foreground="White" BorderThickness="0"
+                        Margin="0,0,0,4"
+                        HorizontalContentAlignment="Left"
+                        Padding="12,10">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#B91C1C"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="FontFamily" Value="Segoe UI"/>
+                                    <Setter Property="FontSize" Value="12.5"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
@@ -597,15 +650,15 @@
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             Margin="0,0,20,0">
-                    <Ellipse Width="6" Height="6" Fill="#FFCFB63E" Margin="0,0,5,0"/>
-                    <TextBlock Text="Chưa kết nối CSDL"
+                    <Ellipse Width="6" Height="6" Fill="{Binding DbConnectionColor}" Margin="0,0,5,0"/>
+                    <TextBlock Text="{Binding DbConnectionStatus}"
                                Foreground="#6B8299"
                                FontFamily="Segoe UI" FontSize="11"/>
                 </StackPanel>
 
                 <TextBlock Grid.Column="1"
                            x:Name="TxtStatusUser"
-                           Text="👤 Bác sĩ Minh  ·  Phân quyền: Admin"
+                           Text="{Binding Role}"
                            Foreground="#6B8299"
                            FontFamily="Segoe UI" FontSize="11"
                            VerticalAlignment="Center"/>

@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.DataContext>
-        <vm:DanhSachBNViewModel/>
+        <vm:VM_DanhSachBN/>
     </UserControl.DataContext>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -211,28 +211,62 @@
                 </Grid>
             </Border>
 
-            <!-- ============ THANH CÔNG CỤ ============ -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20" HorizontalAlignment="Center">
-                <Button Content="{Binding TenNutThem}" 
-                        Command="{Binding LenhThem}" 
-                        Width="110" Height="38" Margin="0,0,10,0" 
-                        Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
+            <!-- ============ THANH CÔNG CỤ & TÌM KIẾM ============ -->
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <Button Content="Chỉnh Sửa" 
-                        Command="{Binding LenhSua}" 
-                        IsEnabled="{Binding CoChon}" 
-                        Width="110" Height="38" Margin="0,0,10,0" 
-                        Style="{StaticResource ActionButtonStyle}"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="{Binding TenNutThem}" 
+                            Command="{Binding LenhThem}" 
+                            Width="110" Height="38" Margin="0,0,10,0" 
+                            Background="#10B981" Foreground="White" FontWeight="SemiBold"/>
 
-                <Button Content="Xóa Hồ Sơ" 
-                        Command="{Binding LenhXoa}" 
-                        IsEnabled="{Binding CoChon}" 
-                        Width="110" Height="38" Margin="0,0,10,0" 
-                        Style="{StaticResource DangerButtonStyle}"/>
+                    <Button Content="Chỉnh Sửa" 
+                            Command="{Binding LenhSua}" 
+                            IsEnabled="{Binding CoChon}" 
+                            Width="110" Height="38" Margin="0,0,10,0" 
+                            Style="{StaticResource ActionButtonStyle}"/>
 
-                <Button Content="Lưu Dữ Liệu" Command="{Binding LenhLuu}" IsEnabled="{Binding IsSua}" 
-                        Width="130" Height="38" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
-            </StackPanel>
+                    <Button Content="Xóa Hồ Sơ" 
+                            Command="{Binding LenhXoa}" 
+                            IsEnabled="{Binding CoChon}" 
+                            Width="110" Height="38" Margin="0,0,10,0" 
+                            Style="{StaticResource DangerButtonStyle}"/>
+
+                    <Button Content="Lưu Dữ Liệu" Command="{Binding LenhLuu}" IsEnabled="{Binding IsSua}" 
+                            Width="130" Height="38" Margin="0,0,10,0" Style="{StaticResource SaveButtonStyle}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🔍 Tìm kiếm:" Foreground="#94A3B8" FontSize="13" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Width="180" Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkTextBox}" Margin="0,0,10,0"/>
+                    
+                    <ComboBox Width="100" ItemsSource="{Binding ListGioiTinhFilter}" SelectedItem="{Binding SelectedGioiTinhFilter, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBox.Resources>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="Background" Value="#334155"/>
+                                <Setter Property="Foreground" Value="#94A3B8"/>
+                                <Setter Property="Padding" Value="10,5"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                            </Style>
+                        </ComboBox.Resources>
+                        <ComboBox.Style>
+                            <Style TargetType="ComboBox">
+                                <Setter Property="Background" Value="#334155"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderBrush" Value="#475569"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="Padding" Value="8,5"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ComboBox.Style>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
 
             <!-- ============ DANH SÁCH BỆNH NHÂN ============ -->
             <Border Grid.Row="2" Background="#1E293B" CornerRadius="12" Padding="10">
@@ -256,3 +290,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

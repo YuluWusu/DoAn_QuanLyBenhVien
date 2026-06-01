@@ -9,7 +9,7 @@
              d:DesignHeight="650" d:DesignWidth="1100" Background="#0F1923" HorizontalAlignment="Stretch" 
              VerticalAlignment="Stretch">
     <UserControl.DataContext>
-        <vm:DanhSachThuocViewModel/>
+        <vm:VM_DanhSachThuoc/>
     </UserControl.DataContext>
     <UserControl.Resources>
         <Style x:Key="txtDark" TargetType="TextBox">
@@ -100,8 +100,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <Grid Width="200" Height="32">
-                    <TextBox x:Name="txtSearch" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" 
+                <Grid Width="200" Height="32" Margin="0,0,10,0">
+                    <TextBox x:Name="txtSearch" Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" 
                              Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" Padding="8,0" FontSize="12"/>
                     <TextBlock IsHitTestVisible="False" Text="Tìm mã hoặc tên thuốc..." VerticalAlignment="Center" 
                                Margin="10,0,0,0" Foreground="#6B8299" FontSize="12">
@@ -117,12 +117,62 @@
                         </TextBlock.Style>
                     </TextBlock>
                 </Grid>
-                <Button Command="{Binding SearchCommand}" Style="{StaticResource BtnGhost}" Width="65" Height="32" Margin="5,0,0,0" FontSize="11">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE71E;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="10"/>
-                        <TextBlock Text="TÌM" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                
+                <ComboBox Width="120" Height="32" ItemsSource="{Binding ListTinhTrangFilter}" SelectedItem="{Binding SelectedTinhTrangFilter, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CboDark}">
+                    <ComboBox.Resources>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="Background" Value="#1A2E45"/>
+                            <Setter Property="Foreground" Value="#6B8299"/>
+                            <Setter Property="Padding" Value="10,5"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+
+                        <Style x:Key="CboDark" TargetType="ComboBox">
+                            <Setter Property="Background" Value="#1A2E45"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#1E3048"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Padding" Value="8,0"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ComboBox">
+                                        <Grid>
+                                            <Border x:Name="templateRoot" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4"/>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="30"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <ContentPresenter x:Name="contentPresenter" Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False"/>
+
+                                                <ToggleButton Grid.ColumnSpan="2" Background="Transparent" BorderThickness="0"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                                                <Path x:Name="arrow" Grid.Column="1" Fill="#6B8299" HorizontalAlignment="Center" 
+                                  VerticalAlignment="Center" Data="M0,0 L4,4 L8,0 Z"/>
+                                            </Grid>
+
+                                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                                <Border x:Name="dropDownBorder" Background="#1A2E45" BorderThickness="1" BorderBrush="#1E3048" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                                    <ScrollViewer SnapsToDevicePixels="True">
+                                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                                    </ScrollViewer>
+                                                </Border>
+                                            </Popup>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ComboBox.Resources>
+                </ComboBox>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -214,3 +264,4 @@
         </Border>
     </Grid>
 </UserControl>
+

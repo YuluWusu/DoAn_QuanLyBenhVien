@@ -19,12 +19,12 @@ namespace DoAn_QuanLyBenhVien.Views
     /// </summary>
     public partial class DangNhap : Window
     {
-        private LoginViewModel _vm;
+        private VM_Login _vm;
 
         public DangNhap()
         {
             InitializeComponent();
-            _vm = new LoginViewModel();
+            _vm = new VM_Login();
             DataContext = _vm;
         }
 

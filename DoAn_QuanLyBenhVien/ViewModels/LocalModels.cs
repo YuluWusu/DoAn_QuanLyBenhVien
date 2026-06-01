@@ -1,35 +1,18 @@
-// =============================================================================
-// LocalModels.cs
-// File này chứa các class UI-helper dùng trong ViewModels.
-// KHÔNG phải EF Entity. Đây là các model phục vụ hiển thị trên giao diện.
-// =============================================================================
-
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using DoAn_QuanLyBenhVien.Helper;
 namespace DoAn_QuanLyBenhVien.ViewModels
 {
-    // -------------------------------------------------------------------------
-    // Dùng cho DonThuocViewModel - đại diện một đơn thuốc trên UI
-    // -------------------------------------------------------------------------
-    public class DonThuocLocal : INotifyPropertyChanged
+    public class DonThuocLocal : BaseViewModel
     {
         public string MaDonThuoc { get; set; }
         public string MaPhieuKham { get; set; }
         public DateTime NgayKe { get; set; }
         public string MaNV_Ke { get; set; }
         public string TenBacSiKe { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
-
-    // -------------------------------------------------------------------------
-    // Dùng cho DonThuocViewModel & PhieuXuatThuocViewModel - chi tiết một đơn thuốc
-    // -------------------------------------------------------------------------
-    public class ChiTietDonThuocLocal : INotifyPropertyChanged
+    public class ChiTietDonThuocLocal : BaseViewModel
     {
         public string MaDonThuoc { get; set; }
         public string MaThuoc { get; set; }
@@ -52,30 +35,22 @@ namespace DoAn_QuanLyBenhVien.ViewModels
 
         public string LieuDung { get; set; }
         public decimal ThanhTien => SoLuong * GiaBan;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
     // -------------------------------------------------------------------------
-    // Dùng cho HoaDonViewModel - chi tiết hóa đơn trên UI
+    // Dùng cho VM_HoaDon - chi tiết hóa đơn trên UI
     // -------------------------------------------------------------------------
-    public class ChiTietHoaDonLoc : INotifyPropertyChanged
+    public class ChiTietHoaDonLoc : BaseViewModel
     {
         public string Loai { get; set; }
         public string MaDoiTuong { get; set; }
         public int SoLuong { get; set; }
         public decimal DonGia { get; set; }
         public decimal ThanhTien => SoLuong * DonGia;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
     // -------------------------------------------------------------------------
-    // Dùng cho DonThuocViewModel - thông tin bác sĩ để hiển thị trong ComboBox
+    // Dùng cho VM_DonThuoc - thông tin bác sĩ để hiển thị trong ComboBox
     // -------------------------------------------------------------------------
     public class BacSiLocal
     {
@@ -84,7 +59,7 @@ namespace DoAn_QuanLyBenhVien.ViewModels
     }
 
     // -------------------------------------------------------------------------
-    // Dùng cho DonThuocViewModel - thông tin thuốc gốc để tra cứu giá
+    // Dùng cho VM_DonThuoc - thông tin thuốc gốc để tra cứu giá
     // -------------------------------------------------------------------------
     public class ThuocGocLocal
     {
@@ -97,7 +72,7 @@ namespace DoAn_QuanLyBenhVien.ViewModels
     // -------------------------------------------------------------------------
     // Dùng cho HoSoKham - đại diện dịch vụ y tế trong màn hình khám
     // -------------------------------------------------------------------------
-    public class DichVuKhamLocal : INotifyPropertyChanged
+    public class DichVuKhamLocal : BaseViewModel
     {
         public string MA_DICHVU { get; set; }
 
@@ -121,9 +96,6 @@ namespace DoAn_QuanLyBenhVien.ViewModels
             get => _isSelected;
             set { _isSelected = value; OnPropertyChanged(); }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
+

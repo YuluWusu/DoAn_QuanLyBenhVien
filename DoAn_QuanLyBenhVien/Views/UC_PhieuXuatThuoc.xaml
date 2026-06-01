@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="1100">
     <UserControl.DataContext>
-        <vm:PhieuXuatThuocViewModel/>
+        <vm:VM_PhieuXuatThuoc/>
     </UserControl.DataContext>
     <Grid Margin="25">
         <Grid.RowDefinitions>
@@ -181,3 +181,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

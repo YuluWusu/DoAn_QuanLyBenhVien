@@ -9,7 +9,7 @@
              d:DesignHeight="650" d:DesignWidth="1080" Background="#0F1923" HorizontalAlignment="Stretch" 
              VerticalAlignment="Stretch">
     <UserControl.DataContext>
-      <vm:DSNhanVienViewModel/>
+      <vm:VM_DSNhanVien/>
     </UserControl.DataContext>
     <UserControl.Resources>
         <Style TargetType="DataGridCell">
@@ -227,7 +227,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <Grid Width="180" Height="32">
+                <Grid Width="180" Height="32" Margin="0,0,10,0">
                     <TextBox x:Name="txtSearch" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" 
                      Background="#1A2E45" Foreground="White" BorderBrush="#1E3048" Padding="8,0" FontSize="12"/>
                     <TextBlock IsHitTestVisible="False" Text="Tìm kiếm..." VerticalAlignment="Center" 
@@ -244,7 +244,8 @@
                         </TextBlock.Style>
                     </TextBlock>
                 </Grid>
-                <Button Content="TÌM" Command="{Binding SearchCommand}" Style="{StaticResource BtnGhost}" Width="60" Height="32" Margin="5,0,0,0" FontSize="11"/>
+
+                <ComboBox Width="120" Height="32" ItemsSource="{Binding ListChucVuFilter}" SelectedItem="{Binding SelectedChucVuFilter, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CboDark}"/>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal">
@@ -363,3 +364,4 @@
         </Border>
     </Grid>
 </UserControl>
+
